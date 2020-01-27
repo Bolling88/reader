@@ -78,7 +78,7 @@ import org.readium.r2.testapp.BuildConfig.DEBUG
 import org.readium.r2.testapp.R
 import org.readium.r2.testapp.db.*
 import org.readium.r2.testapp.drm.LCPLibraryActivityService
-import org.readium.r2.testapp.epub.EpubActivity
+import org.readium.r2.testapp.epub.CustomEpubActivity
 import org.readium.r2.testapp.epub.R2SyntheticPageList
 import org.readium.r2.testapp.opds.GridAutoFitLayoutManager
 import org.readium.r2.testapp.opds.OPDSDownloader
@@ -1023,7 +1023,7 @@ open class LibraryActivity : AppCompatActivity(), BooksAdapter.RecyclerViewClick
     private fun startActivity(publicationPath: String, book: Book, publication: Publication, coverByteArray: ByteArray? = null) {
 
         val intent = Intent(this, when (publication.type) {
-            else -> EpubActivity::class.java
+            else -> CustomEpubActivity::class.java
         })
         intent.putExtra("publicationPath", publicationPath)
         intent.putExtra("publicationFileName", book.fileName)
