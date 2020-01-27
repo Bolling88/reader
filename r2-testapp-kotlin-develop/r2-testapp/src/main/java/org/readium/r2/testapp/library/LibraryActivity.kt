@@ -73,7 +73,6 @@ import org.readium.r2.streamer.server.BASE_URL
 import org.readium.r2.streamer.server.Server
 import org.readium.r2.testapp.BuildConfig.DEBUG
 import org.readium.r2.testapp.R
-import org.readium.r2.testapp.R2AboutActivity
 import org.readium.r2.testapp.db.*
 import org.readium.r2.testapp.drm.LCPLibraryActivityService
 import org.readium.r2.testapp.epub.EpubActivity
@@ -671,11 +670,6 @@ open class LibraryActivity : AppCompatActivity(), BooksAdapter.RecyclerViewClick
                 startActivity(intentFor<OPDSListActivity>())
                 false
             }
-            R.id.about -> {
-                startActivity(intentFor<R2AboutActivity>())
-                false
-            }
-
             else -> super.onOptionsItemSelected(item)
         }
 

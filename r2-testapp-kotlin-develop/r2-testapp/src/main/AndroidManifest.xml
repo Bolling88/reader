@@ -107,16 +107,7 @@
             android:name=".opds.OPDSCatalogActivity"
             android:label="@string/title_activity_opdscatalog" />
         <activity
-            android:name=".R2AboutActivity"
-            android:label="@string/title_activity_r2_about" />
-        <activity
             android:name=".epub.EpubActivity"
-            android:label="@string/title_activity_epub" />
-        <activity
-            android:name=".comic.DiViNaActivity"
-            android:label="@string/title_activity_epub" />
-        <activity
-            android:name=".comic.ComicActivity"
             android:label="@string/title_activity_epub" />
         <activity
             android:name=".DRMManagementActivity"
@@ -131,9 +122,6 @@
         <activity
             android:name=".opds.OPDSDetailActivity"
             android:label="@string/title_activity_opds_detail" />
-        <activity
-            android:name=".audiobook.AudiobookActivity"
-            android:label="@string/title_activity_epub" />
     </application>
 
 </manifest>
