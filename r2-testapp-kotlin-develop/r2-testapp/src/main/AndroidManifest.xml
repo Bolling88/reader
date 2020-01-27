@@ -104,9 +104,6 @@
 
         </activity>
         <activity
-            android:name=".opds.OPDSCatalogActivity"
-            android:label="@string/title_activity_opdscatalog" />
-        <activity
             android:name=".epub.EpubActivity"
             android:label="@string/title_activity_epub" />
         <activity
@@ -116,12 +113,6 @@
         <activity
             android:name=".outline.R2OutlineActivity"
             android:label="@string/title_activity_outline" />
-        <activity
-            android:name=".opds.OPDSListActivity"
-            android:label="@string/title_activity_opds_list" />
-        <activity
-            android:name=".opds.OPDSDetailActivity"
-            android:label="@string/title_activity_opds_detail" />
     </application>
 
 </manifest>

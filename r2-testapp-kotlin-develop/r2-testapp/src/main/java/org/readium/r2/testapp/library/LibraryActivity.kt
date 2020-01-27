@@ -26,7 +26,10 @@ import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import android.text.TextUtils
-import android.view.*
+import android.view.Gravity
+import android.view.LayoutInflater
+import android.view.Menu
+import android.view.View
 import android.webkit.MimeTypeMap
 import android.webkit.URLUtil
 import android.widget.Button
@@ -79,7 +82,6 @@ import org.readium.r2.testapp.epub.EpubActivity
 import org.readium.r2.testapp.epub.R2SyntheticPageList
 import org.readium.r2.testapp.opds.GridAutoFitLayoutManager
 import org.readium.r2.testapp.opds.OPDSDownloader
-import org.readium.r2.testapp.opds.OPDSListActivity
 import org.readium.r2.testapp.permissions.PermissionHelper
 import org.readium.r2.testapp.permissions.Permissions
 import org.readium.r2.testapp.utils.ContentResolverUtil
@@ -661,18 +663,6 @@ open class LibraryActivity : AppCompatActivity(), BooksAdapter.RecyclerViewClick
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_main, menu)
         return super.onCreateOptionsMenu(menu)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-
-            R.id.opds -> {
-                startActivity(intentFor<OPDSListActivity>())
-                false
-            }
-            else -> super.onOptionsItemSelected(item)
-        }
-
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
