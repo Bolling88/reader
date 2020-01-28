@@ -60,15 +60,8 @@ import org.readium.r2.testapp.search.SearchLocatorAdapter
 import timber.log.Timber
 import kotlin.coroutines.CoroutineContext
 
-
-/**
- * EpubActivity : Extension of the EpubActivity() from navigator
- *
- * That Activity manage everything related to the menu
- *      ( Table of content, User Settings, DRM, Bookmarks )
- *
- */
-class EpubActivity : R2EpubActivity(), CoroutineScope, NavigatorDelegate/*, VisualNavigatorDelegate, OutlineTableViewControllerDelegate*/ {
+class EpubActivity : R2EpubActivity(), CoroutineScope,
+    NavigatorDelegate/*, VisualNavigatorDelegate, OutlineTableViewControllerDelegate*/ {
 
     override val currentLocation: Locator?
         get() {
@@ -78,7 +71,12 @@ class EpubActivity : R2EpubActivity(), CoroutineScope, NavigatorDelegate/*, Visu
                 val resource = publication.readingOrder[resourcePager.currentItem]
                 val resourceHref = resource.href ?: ""
                 val resourceType = resource.typeLink ?: ""
-                Locator(resourceHref, resourceType, publication.metadata.title, Locations(progression = 0.0))
+                Locator(
+                    resourceHref,
+                    resourceType,
+                    publication.metadata.title,
+                    Locations(progression = 0.0)
+                )
             }
         }
 
@@ -121,7 +119,7 @@ class EpubActivity : R2EpubActivity(), CoroutineScope, NavigatorDelegate/*, Visu
     private var mode: ActionMode? = null
     private var popupWindow: PopupWindow? = null
 
-    override var allowToggleActionBar = false
+    override var allowToggleActionBar = true
 
     /**
      * Manage activity creation.
@@ -131,10 +129,8 @@ class EpubActivity : R2EpubActivity(), CoroutineScope, NavigatorDelegate/*, Visu
      *   - Initialize search.
      */
     override fun onCreate(savedInstanceState: Bundle?) {
-        if (activitiesLaunched.incrementAndGet() > 1) {
-            finish()
-        }
         super.onCreate(savedInstanceState)
+        supportActionBar?.hide()
         bookmarksDB = BookmarksDatabase(this)
         booksDB = BooksDatabase(this)
         positionsDB = PositionsDatabase(this)
@@ -153,40 +149,46 @@ class EpubActivity : R2EpubActivity(), CoroutineScope, NavigatorDelegate/*, Visu
         val backgroundsColors = mutableListOf("#ffffff", "#faf4e8", "#000000")
         val textColors = mutableListOf("#000000", "#000000", "#ffffff")
         resourcePager.setBackgroundColor(Color.parseColor(backgroundsColors[appearancePref]))
-        (resourcePager.focusedChild?.findViewById(org.readium.r2.navigator.R.id.book_title) as? TextView)?.setTextColor(Color.parseColor(textColors[appearancePref]))
+        (resourcePager.focusedChild?.findViewById(org.readium.r2.navigator.R.id.book_title) as? TextView)?.setTextColor(
+            Color.parseColor(textColors[appearancePref])
+        )
         toggleActionBar()
 
         resourcePager.offscreenPageLimit = 1
 
-        currentPagerPosition = publication.readingOrder.indexOfFirst { it.href == currentLocation?.href }
+        currentPagerPosition =
+            publication.readingOrder.indexOfFirst { it.href == currentLocation?.href }
         resourcePager.currentItem = currentPagerPosition
 
         // SEARCH
         searchStorage = getSharedPreferences("org.readium.r2.search", Context.MODE_PRIVATE)
         searchResult = mutableListOf()
-        searchResultAdapter = SearchLocatorAdapter(this, searchResult, object : SearchLocatorAdapter.RecyclerViewClickListener {
-            override fun recyclerViewListClicked(v: View, position: Int) {
+        searchResultAdapter = SearchLocatorAdapter(
+            this,
+            searchResult,
+            object : SearchLocatorAdapter.RecyclerViewClickListener {
+                override fun recyclerViewListClicked(v: View, position: Int) {
 
-                search_overlay.visibility = View.INVISIBLE
-                val searchView = menuSearch?.actionView as SearchView
+                    search_overlay.visibility = View.INVISIBLE
+                    val searchView = menuSearch?.actionView as SearchView
 
-                searchView.clearFocus()
-                if (searchView.isShown) {
-                    menuSearch?.collapseActionView()
-                    resourcePager.offscreenPageLimit = 1
+                    searchView.clearFocus()
+                    if (searchView.isShown) {
+                        menuSearch?.collapseActionView()
+                        resourcePager.offscreenPageLimit = 1
+                    }
+
+                    val locator = searchResult[position]
+                    val intent = Intent()
+                    intent.putExtra("publicationPath", publicationPath)
+                    intent.putExtra("epubName", publicationFileName)
+                    intent.putExtra("publication", publication)
+                    intent.putExtra("bookId", bookId)
+                    intent.putExtra("locator", locator)
+                    onActivityResult(2, Activity.RESULT_OK, intent)
                 }
 
-                val locator = searchResult[position]
-                val intent = Intent()
-                intent.putExtra("publicationPath", publicationPath)
-                intent.putExtra("epubName", publicationFileName)
-                intent.putExtra("publication", publication)
-                intent.putExtra("bookId", bookId)
-                intent.putExtra("locator", locator)
-                onActivityResult(2, Activity.RESULT_OK, intent)
-            }
-
-        })
+            })
         search_listView.adapter = searchResultAdapter
         search_listView.layoutManager = LinearLayoutManager(this)
 
@@ -229,7 +231,8 @@ class EpubActivity : R2EpubActivity(), CoroutineScope, NavigatorDelegate/*, Visu
                     //Saving searched term
                     searchTerm = query
                     //Initializing our custom search interfaces
-                    val progress = indeterminateProgressDialog(getString(R.string.progress_wait_while_searching_book))
+                    val progress =
+                        indeterminateProgressDialog(getString(R.string.progress_wait_while_searching_book))
                     progress.show()
 
                     val markJSSearchInterface = MarkJSSearchEngine(this@EpubActivity)
@@ -289,7 +292,12 @@ class EpubActivity : R2EpubActivity(), CoroutineScope, NavigatorDelegate/*, Visu
                 val tmp = searchStorage.getString("result", null)
                 if (tmp != null) {
                     searchResult.clear()
-                    searchResult.addAll(Gson().fromJson(tmp, Array<SearchLocator>::class.java).asList().toMutableList())
+                    searchResult.addAll(
+                        Gson().fromJson(
+                            tmp,
+                            Array<SearchLocator>::class.java
+                        ).asList().toMutableList()
+                    )
                     searchResultAdapter.notifyDataSetChanged()
 
                     val keyword = searchStorage.getString("term", null)
@@ -323,7 +331,10 @@ class EpubActivity : R2EpubActivity(), CoroutineScope, NavigatorDelegate/*, Visu
 
             searchView.setQuery("", false)
 
-            (getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager).toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY)
+            (getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager).toggleSoftInput(
+                InputMethodManager.SHOW_FORCED,
+                InputMethodManager.HIDE_IMPLICIT_ONLY
+            )
 
             val editor = searchStorage.edit()
             editor.remove("result")
@@ -376,11 +387,15 @@ class EpubActivity : R2EpubActivity(), CoroutineScope, NavigatorDelegate/*, Visu
                 return true
             }
             R.id.settings -> {
-                userSettings.userSettingsPopUp().showAsDropDown(this.findViewById(R.id.settings), 0, 0, Gravity.END)
+                userSettings.userSettingsPopUp()
+                    .showAsDropDown(this.findViewById(R.id.settings), 0, 0, Gravity.END)
                 return true
             }
             R.id.drm -> {
-                startActivityForResult(intentFor<DRMManagementActivity>("publication" to publicationPath), 1)
+                startActivityForResult(
+                    intentFor<DRMManagementActivity>("publication" to publicationPath),
+                    1
+                )
                 return true
             }
             R.id.bookmark -> {
@@ -389,19 +404,26 @@ class EpubActivity : R2EpubActivity(), CoroutineScope, NavigatorDelegate/*, Visu
                 val resourceHref = resource.href ?: ""
                 val resourceType = resource.typeLink ?: ""
                 val resourceTitle = resource.title ?: ""
-                val currentPage = positionsDB.positions.getCurrentPage(bookId, resourceHref, currentLocation?.locations?.progression!!)?.let {
+                val currentPage = positionsDB.positions.getCurrentPage(
+                    bookId,
+                    resourceHref,
+                    currentLocation?.locations?.progression!!
+                )?.let {
                     it
                 }
 
                 val bookmark = Bookmark(
-                        bookId,
-                        publicationIdentifier,
-                        resourceIndex,
-                        resourceHref,
-                        resourceType,
-                        resourceTitle,
-                        Locations(progression = currentLocation?.locations?.progression, position = currentPage),
-                        LocatorText()
+                    bookId,
+                    publicationIdentifier,
+                    resourceIndex,
+                    resourceHref,
+                    resourceType,
+                    resourceTitle,
+                    Locations(
+                        progression = currentLocation?.locations?.progression,
+                        position = currentPage
+                    ),
+                    LocatorText()
                 )
 
                 bookmarksDB.bookmarks.insert(bookmark)?.let {
@@ -463,16 +485,23 @@ class EpubActivity : R2EpubActivity(), CoroutineScope, NavigatorDelegate/*, Visu
                         }
 
                         val index = fragments.getValue("i").toInt()
-                        val searchStorage = getSharedPreferences("org.readium.r2.search", Context.MODE_PRIVATE)
+                        val searchStorage =
+                            getSharedPreferences("org.readium.r2.search", Context.MODE_PRIVATE)
                         Handler().postDelayed({
                             if (publication.metadata.rendition.layout == RenditionLayout.Reflowable) {
-                                val currentFragment = (resourcePager.adapter as R2PagerAdapter).getCurrentFragment() as R2EpubPageFragment
+                                val currentFragment =
+                                    (resourcePager.adapter as R2PagerAdapter).getCurrentFragment() as R2EpubPageFragment
                                 val resource = publication.readingOrder[resourcePager.currentItem]
                                 val resourceHref = resource.href ?: ""
                                 val resourceType = resource.typeLink ?: ""
                                 val resourceTitle = resource.title ?: ""
 
-                                currentFragment.webView.runJavaScript("markSearch('${searchStorage.getString("term", null)}', null, '$resourceHref', '$resourceType', '$resourceTitle', '$index')") { result ->
+                                currentFragment.webView.runJavaScript(
+                                    "markSearch('${searchStorage.getString(
+                                        "term",
+                                        null
+                                    )}', null, '$resourceHref', '$resourceType', '$resourceTitle', '$index')"
+                                ) { result ->
 
                                     if (DEBUG) Timber.d("###### $result")
 
@@ -491,7 +520,9 @@ class EpubActivity : R2EpubActivity(), CoroutineScope, NavigatorDelegate/*, Visu
         mode?.menu?.run {
             menuInflater.inflate(R.menu.menu_action_mode, this)
             findItem(R.id.highlight).setOnMenuItemClickListener {
-                val currentFragment = ((resourcePager.adapter as R2PagerAdapter).mFragments.get((resourcePager.adapter as R2PagerAdapter).getItemId(resourcePager.currentItem))) as? R2EpubPageFragment
+                val currentFragment = ((resourcePager.adapter as R2PagerAdapter).mFragments.get(
+                    (resourcePager.adapter as R2PagerAdapter).getItemId(resourcePager.currentItem)
+                )) as? R2EpubPageFragment
 
                 currentFragment?.webView?.getCurrentSelectionRect {
                     val rect = JSONObject(it).run {
@@ -503,7 +534,12 @@ class EpubActivity : R2EpubActivity(), CoroutineScope, NavigatorDelegate/*, Visu
                             val width = getDouble("width")
                             val top = getDouble("top") * metrics.density
                             val height = getDouble("height") * metrics.density
-                            Rect(left.toInt(), top.toInt(), width.toInt() + left.toInt(), top.toInt() + height.toInt())
+                            Rect(
+                                left.toInt(),
+                                top.toInt(),
+                                width.toInt() + left.toInt(),
+                                top.toInt() + height.toInt()
+                            )
                         } catch (e: JSONException) {
                             null
                         }
@@ -522,7 +558,11 @@ class EpubActivity : R2EpubActivity(), CoroutineScope, NavigatorDelegate/*, Visu
         this.mode = mode
     }
 
-    private fun showHighlightPopup(highlightID: String? = null, size: Rect?, dismissCallback: () -> Unit) {
+    private fun showHighlightPopup(
+        highlightID: String? = null,
+        size: Rect?,
+        dismissCallback: () -> Unit
+    ) {
         popupWindow?.let {
             if (it.isShowing) {
                 return
@@ -543,13 +583,20 @@ class EpubActivity : R2EpubActivity(), CoroutineScope, NavigatorDelegate/*, Visu
         display.getSize(mDisplaySize)
 
         val popupView = layoutInflater.inflate(
-                if (rect.top > rect.height()) R.layout.view_action_mode_reverse else R.layout.view_action_mode,
-                null,
-                false
+            if (rect.top > rect.height()) R.layout.view_action_mode_reverse else R.layout.view_action_mode,
+            null,
+            false
         )
-        popupView.measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED), View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED))
+        popupView.measure(
+            View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
+            View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
+        )
 
-        popupWindow = PopupWindow(popupView, LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT)
+        popupWindow = PopupWindow(
+            popupView,
+            LinearLayout.LayoutParams.WRAP_CONTENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT
+        )
         popupWindow?.isFocusable = true
 
         val x = rect.left
@@ -591,14 +638,17 @@ class EpubActivity : R2EpubActivity(), CoroutineScope, NavigatorDelegate/*, Visu
 
     }
 
-    private fun changeHighlightColor(highlight: org.readium.r2.navigator.epub.Highlight? = null, color: Int) {
+    private fun changeHighlightColor(
+        highlight: org.readium.r2.navigator.epub.Highlight? = null,
+        color: Int
+    ) {
         if (highlight != null) {
             val navigatorHighlight = org.readium.r2.navigator.epub.Highlight(
-                    highlight.id,
-                    highlight.locator,
-                    color,
-                    highlight.style,
-                    highlight.annotationMarkStyle
+                highlight.id,
+                highlight.locator,
+                color,
+                highlight.style,
+                highlight.annotationMarkStyle
             )
             showHighlight(navigatorHighlight)
             addHighlight(navigatorHighlight)
@@ -618,11 +668,11 @@ class EpubActivity : R2EpubActivity(), CoroutineScope, NavigatorDelegate/*, Visu
         }
 
         highlightDB.highlights.insert(
-                convertNavigationHighlight2Highlight(
-                        highlight,
-                        annotation,
-                        highlight.annotationMarkStyle
-                )
+            convertNavigationHighlight2Highlight(
+                highlight,
+                annotation,
+                highlight.annotationMarkStyle
+            )
         )
     }
 
@@ -635,9 +685,12 @@ class EpubActivity : R2EpubActivity(), CoroutineScope, NavigatorDelegate/*, Visu
         }
     }
 
-    private fun addAnnotation(highlight: org.readium.r2.navigator.epub.Highlight, annotation: String) {
+    private fun addAnnotation(
+        highlight: org.readium.r2.navigator.epub.Highlight,
+        annotation: String
+    ) {
         highlightDB.highlights.insert(
-                convertNavigationHighlight2Highlight(highlight, annotation, "annotation")
+            convertNavigationHighlight2Highlight(highlight, annotation, "annotation")
         )
     }
 
@@ -652,8 +705,8 @@ class EpubActivity : R2EpubActivity(), CoroutineScope, NavigatorDelegate/*, Visu
     private fun showAnnotationPopup(highlight: org.readium.r2.navigator.epub.Highlight? = null) {
         val view = layoutInflater.inflate(R.layout.popup_note, null, false)
         val alert = AlertDialog.Builder(this)
-                .setView(view)
-                .create()
+            .setView(view)
+            .create()
 
         val annotation = highlight?.run {
             highlightDB.highlights.list(id).first().run {
@@ -668,7 +721,10 @@ class EpubActivity : R2EpubActivity(), CoroutineScope, NavigatorDelegate/*, Visu
                 if (note.text.isEmpty().not()) {
                     createAnnotation(highlight) {
                         addAnnotation(it, note.text.toString())
-                        (getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager).hideSoftInputFromWindow(note.applicationWindowToken, InputMethodManager.HIDE_NOT_ALWAYS)
+                        (getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager).hideSoftInputFromWindow(
+                            note.applicationWindowToken,
+                            InputMethodManager.HIDE_NOT_ALWAYS
+                        )
                     }
                 }
                 alert.dismiss()
@@ -679,7 +735,10 @@ class EpubActivity : R2EpubActivity(), CoroutineScope, NavigatorDelegate/*, Visu
                 alert.dismiss()
                 mode?.finish()
                 popupWindow?.dismiss()
-                (getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager).hideSoftInputFromWindow(note.applicationWindowToken, InputMethodManager.HIDE_NOT_ALWAYS)
+                (getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager).hideSoftInputFromWindow(
+                    note.applicationWindowToken,
+                    InputMethodManager.HIDE_NOT_ALWAYS
+                )
             }
             if (highlight != null) {
                 findViewById<TextView>(R.id.select_text).text = highlight.locator.text?.highlight
@@ -710,13 +769,21 @@ class EpubActivity : R2EpubActivity(), CoroutineScope, NavigatorDelegate/*, Visu
         showAnnotationPopup(convertHighlight2NavigationHighlight(highlight))
     }
 
-    private fun convertNavigationHighlight2Highlight(highlight: org.readium.r2.navigator.epub.Highlight, annotation: String? = null, annotationMarkStyle: String? = null): Highlight {
+    private fun convertNavigationHighlight2Highlight(
+        highlight: org.readium.r2.navigator.epub.Highlight,
+        annotation: String? = null,
+        annotationMarkStyle: String? = null
+    ): Highlight {
         val resourceIndex = resourcePager.currentItem.toLong()
         val resource = publication.readingOrder[resourcePager.currentItem]
         val resourceHref = resource.href ?: ""
         val resourceType = resource.typeLink ?: ""
         val resourceTitle = resource.title ?: ""
-        val currentPage = positionsDB.positions.getCurrentPage(bookId, resourceHref, currentLocation?.locations?.progression!!)?.let {
+        val currentPage = positionsDB.positions.getCurrentPage(
+            bookId,
+            resourceHref,
+            currentLocation?.locations?.progression!!
+        )?.let {
             it
         }
 
@@ -727,34 +794,35 @@ class EpubActivity : R2EpubActivity(), CoroutineScope, NavigatorDelegate/*, Visu
         val locationText = highlight.locator.text ?: LocatorText()
 
         return Highlight(
-                highlight.id,
-                publicationIdentifier,
-                "style",
-                highlight.color,
-                annotation ?: "",
-                annotationMarkStyle ?: "",
-                resourceIndex,
-                resourceHref,
-                resourceType,
-                resourceTitle,
-                highlightLocations,
-                locationText,
-                bookID = bookId
+            highlight.id,
+            publicationIdentifier,
+            "style",
+            highlight.color,
+            annotation ?: "",
+            annotationMarkStyle ?: "",
+            resourceIndex,
+            resourceHref,
+            resourceType,
+            resourceTitle,
+            highlightLocations,
+            locationText,
+            bookID = bookId
         )
     }
 
-    private fun convertHighlight2NavigationHighlight(highlight: Highlight) = org.readium.r2.navigator.epub.Highlight(
+    private fun convertHighlight2NavigationHighlight(highlight: Highlight) =
+        org.readium.r2.navigator.epub.Highlight(
             highlight.highlightID,
             Locator(
-                    highlight.resourceHref,
-                    highlight.resourceType,
-                    locations = highlight.locations,
-                    text = highlight.locatorText
+                highlight.resourceHref,
+                highlight.resourceType,
+                locations = highlight.locations,
+                text = highlight.locatorText
             ),
             highlight.color,
             Style.highlight,
             highlight.annotationMarkStyle
-    )
+        )
 
     /**
      * Manage what happens when the focus is put back on the EpubActivity.
@@ -799,14 +867,19 @@ class EpubActivity : R2EpubActivity(), CoroutineScope, NavigatorDelegate/*, Visu
      * fed back to the user) and toggle the ActionBar if it is disabled and if the text to speech is invisible.
      */
     override fun toggleActionBar() {
-//        val am = getSystemService(ACCESSIBILITY_SERVICE) as AccessibilityManager
-//        isExploreByTouchEnabled = am.isTouchExplorationEnabled
-//
-//        if (!isExploreByTouchEnabled) {
-//            super.toggleActionBar()
-//        }
-//        launch(coroutineContext) {
-//            mode?.finish()
+//        launch {
+//            if (supportActionBar!!.isShowing) {
+//                resourcePager.systemUiVisibility = (View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+//                        or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+//                        or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+//                        or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+//                        or View.SYSTEM_UI_FLAG_FULLSCREEN // hide status bar
+//                        or View.SYSTEM_UI_FLAG_IMMERSIVE)
+//            } else {
+//                resourcePager.systemUiVisibility = (View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+//                        or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+//                        or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN)
+//            }
 //        }
     }
 
