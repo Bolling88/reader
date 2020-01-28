@@ -1,12 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><!--
-  ~ Module: r2-navigator-kotlin
-  ~ Developers: Aferdita Muriqi, Clément Baumann
-  ~
-  ~ Copyright (c) 2018. Readium Foundation. All rights reserved.
-  ~ Use of this source code is governed by a BSD-style license which is detailed in the
-  ~ LICENSE file present in the project repository where this source code is maintained.
-  -->
-
+<?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -44,12 +36,12 @@
             app:layout_constraintTop_toTopOf="@id/search_overlay" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <FrameLayout
-        android:id="@+id/frame_top"
-        android:layout_width="match_parent"
-        android:layout_height="200dip"
-        android:elevation="10dip"
-        android:background="@color/colorAccent"
+    <fragment
+        android:id="@+id/fragment_overlay"
+        android:name="org.readium.r2.testapp.epub.fragment.OverlayFragment"
+        android:layout_width="0dip"
+        android:layout_height="0dip"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

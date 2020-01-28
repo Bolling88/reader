@@ -20,14 +20,12 @@ import android.graphics.Rect
 import android.os.Bundle
 import android.os.Handler
 import android.util.DisplayMetrics
-import android.util.TypedValue
 import android.view.*
 import android.view.accessibility.AccessibilityManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
-import androidx.core.widget.TextViewCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.activity_epub.*
@@ -52,6 +50,7 @@ import org.readium.r2.testapp.BuildConfig.DEBUG
 import org.readium.r2.testapp.DRMManagementActivity
 import org.readium.r2.testapp.R
 import org.readium.r2.testapp.db.*
+import org.readium.r2.testapp.epub.fragment.OverlayFragment
 import org.readium.r2.testapp.library.activitiesLaunched
 import org.readium.r2.testapp.outline.R2OutlineActivity
 import org.readium.r2.testapp.search.MarkJSSearchEngine
@@ -94,6 +93,9 @@ class EpubActivity : R2EpubActivity(), CoroutineScope,
     //UserSettings
     private lateinit var userSettings: UserSettings
 
+    //Overlay fragment
+    private lateinit var overlayFragment: OverlayFragment
+
     //Accessibility
     private var isExploreByTouchEnabled = false
     private var pageEnded = false
@@ -134,6 +136,9 @@ class EpubActivity : R2EpubActivity(), CoroutineScope,
         resourcePager.systemUiVisibility = (View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
                 or View.SYSTEM_UI_FLAG_FULLSCREEN
                 or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION)
+
+        overlayFragment = supportFragmentManager.findFragmentById(R.id.fragment_overlay) as OverlayFragment
+
         bookmarksDB = BookmarksDatabase(this)
         booksDB = BooksDatabase(this)
         positionsDB = PositionsDatabase(this)
@@ -147,13 +152,6 @@ class EpubActivity : R2EpubActivity(), CoroutineScope,
                 menuDrm?.isVisible = intent.getBooleanExtra("drm", false)
             }
         }, 100)
-
-        frame_top.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
-            override fun onGlobalLayout() {
-                frame_top.viewTreeObserver.removeOnGlobalLayoutListener(this)
-                frame_top.translationY = -frame_top.height.toFloat()
-            }
-        })
 
         val appearancePref = preferences.getInt(APPEARANCE_REF, 0)
         val backgroundsColors = mutableListOf("#ffffff", "#faf4e8", "#000000")
@@ -878,11 +876,7 @@ class EpubActivity : R2EpubActivity(), CoroutineScope,
      */
     override fun toggleActionBar() {
         launch {
-            if (frame_top.translationY == -frame_top.height.toFloat()) {
-                frame_top.animate().translationY(0f).duration = ANIMATION_DURATION
-            } else {
-                frame_top.animate().translationY(-frame_top.height.toFloat()).duration = ANIMATION_DURATION
-            }
+            overlayFragment?.onCenterClicked()
         }
     }
 

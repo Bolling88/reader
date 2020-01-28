@@ -126,11 +126,11 @@ dependencies {
     implementation "com.google.android.material:material:1.2.0-alpha03"
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
 
-    implementation ('com.github.edrlab.nanohttpd:nanohttpd-nanolets:2.3.2') {
+    implementation('com.github.edrlab.nanohttpd:nanohttpd-nanolets:2.3.2') {
         exclude group: 'org.parboiled'
     }
 
-    implementation ('com.github.edrlab.nanohttpd:nanohttpd:2.3.2') {
+    implementation('com.github.edrlab.nanohttpd:nanohttpd:2.3.2') {
         exclude group: 'org.parboiled'
     }
 
@@ -177,6 +177,9 @@ dependencies {
     implementation 'com.github.abacritt:sectionedmergeadapter:0.2'
     implementation 'org.jsoup:jsoup:1.10.3'
 
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    implementation 'androidx.lifecycle:lifecycle-extensions:2.0.0'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.0.0'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:runner:1.2.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
