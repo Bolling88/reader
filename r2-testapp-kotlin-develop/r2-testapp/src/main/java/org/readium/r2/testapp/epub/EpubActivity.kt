@@ -870,6 +870,13 @@ class EpubActivity : R2EpubActivity(), CoroutineScope,
      * fed back to the user) and toggle the ActionBar if it is disabled and if the text to speech is invisible.
      */
     override fun toggleActionBar() {
+        launch {
+            if (frame_top.visibility == View.VISIBLE) {
+                frame_top.visibility = View.GONE
+            } else {
+                frame_top.visibility = View.VISIBLE
+            }
+        }
 //        launch {
 //            if (supportActionBar!!.isShowing) {
 //                resourcePager.systemUiVisibility = (View.SYSTEM_UI_FLAG_LAYOUT_STABLE

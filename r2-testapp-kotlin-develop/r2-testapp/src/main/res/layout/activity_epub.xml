@@ -44,5 +44,15 @@
             app:layout_constraintTop_toTopOf="@id/search_overlay" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+    <FrameLayout
+        android:id="@+id/frame_top"
+        android:layout_width="match_parent"
+        android:layout_height="200dip"
+        android:elevation="10dip"
+        android:background="@color/colorAccent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
