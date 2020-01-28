@@ -35,6 +35,13 @@ class OverlayFragment : Fragment() {
                 binding.frameTop.translationY = -binding.frameTop.height.toFloat()
             }
         })
+
+        binding.frameBottom.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
+            override fun onGlobalLayout() {
+                binding.frameBottom.viewTreeObserver.removeOnGlobalLayoutListener(this)
+                binding.frameBottom.translationY = binding.frameBottom.height.toFloat()
+            }
+        })
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -44,15 +51,18 @@ class OverlayFragment : Fragment() {
 
     fun onCenterClicked(){
         if (binding.frameTop.translationY == -binding.frameTop.height.toFloat()) {
-            binding.frameTop.animate().translationY(0f).duration = EpubActivity.ANIMATION_DURATION
+            binding.frameTop.animate().translationY(0f).duration = ANIMATION_DURATION
+            binding.frameBottom.animate().translationY(0f).duration = ANIMATION_DURATION
         } else {
             binding.frameTop.animate().translationY(-binding.frameTop.height.toFloat()).duration =
-                EpubActivity.ANIMATION_DURATION
+                ANIMATION_DURATION
+            binding.frameBottom.animate().translationY(binding.frameBottom.height.toFloat()).duration =
+                ANIMATION_DURATION
         }
     }
 
     companion object {
         fun newInstance() = OverlayFragment()
+        const val ANIMATION_DURATION = 200L
     }
-
 }

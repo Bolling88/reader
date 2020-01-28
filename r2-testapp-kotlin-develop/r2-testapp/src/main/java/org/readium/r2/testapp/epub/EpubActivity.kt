@@ -904,8 +904,4 @@ class EpubActivity : R2EpubActivity(), CoroutineScope,
         super.playTextChanged(text)
         findViewById<TextView>(R.id.tts_textView)?.text = text
     }
-
-    companion object{
-        const val ANIMATION_DURATION = 200L
-    }
 }
