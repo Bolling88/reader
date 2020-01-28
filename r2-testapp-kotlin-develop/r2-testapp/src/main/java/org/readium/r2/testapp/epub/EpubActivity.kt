@@ -131,6 +131,9 @@ class EpubActivity : R2EpubActivity(), CoroutineScope,
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         supportActionBar?.hide()
+        resourcePager.systemUiVisibility = (View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                or View.SYSTEM_UI_FLAG_FULLSCREEN
+                or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION)
         bookmarksDB = BookmarksDatabase(this)
         booksDB = BooksDatabase(this)
         positionsDB = PositionsDatabase(this)
