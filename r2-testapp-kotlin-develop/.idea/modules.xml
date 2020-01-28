@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/r2-testapp/r2-testapp.iml" filepath="$PROJECT_DIR$/r2-testapp/r2-testapp.iml" group="r2-testapp-kotlin-develop/r2-testapp" />
+      <module fileurl="file://$PROJECT_DIR$/r2-testapp-kotlin-develop.iml" filepath="$PROJECT_DIR$/r2-testapp-kotlin-develop.iml" group="r2-testapp-kotlin-develop" />
+    </modules>
+  </component>
+</project>

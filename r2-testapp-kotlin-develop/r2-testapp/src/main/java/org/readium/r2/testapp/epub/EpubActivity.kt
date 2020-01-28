@@ -84,10 +84,6 @@ class EpubActivity : R2EpubActivity(), CoroutineScope, NavigatorDelegate/*, Visu
 
     override fun locationDidChange(navigator: Navigator?, locator: Locator) {
         booksDB.books.saveProgression(locator, bookId)
-
-        if (locator.locations?.progression == 0.toDouble()) {
-            screenReader.currentUtterance = 0
-        }
     }
 
 
@@ -110,9 +106,6 @@ class EpubActivity : R2EpubActivity(), CoroutineScope, NavigatorDelegate/*, Visu
     private lateinit var positionsDB: PositionsDatabase
     private lateinit var highlightDB: HighligtsDatabase
 
-
-    private lateinit var screenReader: R2ScreenReader
-
     private var menuDrm: MenuItem? = null
     private var menuToc: MenuItem? = null
     private var menuBmk: MenuItem? = null
@@ -127,6 +120,8 @@ class EpubActivity : R2EpubActivity(), CoroutineScope, NavigatorDelegate/*, Visu
 
     private var mode: ActionMode? = null
     private var popupWindow: PopupWindow? = null
+
+    override var allowToggleActionBar = false
 
     /**
      * Manage activity creation.
@@ -166,45 +161,6 @@ class EpubActivity : R2EpubActivity(), CoroutineScope, NavigatorDelegate/*, Visu
         currentPagerPosition = publication.readingOrder.indexOfFirst { it.href == currentLocation?.href }
         resourcePager.currentItem = currentPagerPosition
 
-        titleView.text = publication.metadata.title
-
-        play_pause.setOnClickListener {
-            if (screenReader.isPaused) {
-                screenReader.resumeReading()
-                play_pause.setImageResource(android.R.drawable.ic_media_pause)
-            } else {
-                screenReader.pauseReading()
-                play_pause.setImageResource(android.R.drawable.ic_media_play)
-            }
-        }
-        fast_forward.setOnClickListener {
-            if (screenReader.nextSentence()) {
-                play_pause.setImageResource(android.R.drawable.ic_media_pause)
-            } else {
-                next_chapter.callOnClick()
-            }
-        }
-        next_chapter.setOnClickListener {
-            if (goForward(false, completion = {})) {
-                screenReader.nextResource()
-                play_pause.setImageResource(android.R.drawable.ic_media_pause)
-            }
-        }
-        fast_back.setOnClickListener {
-            if (screenReader.previousSentence()) {
-                play_pause.setImageResource(android.R.drawable.ic_media_pause)
-            } else {
-                prev_chapter.callOnClick()
-            }
-        }
-        prev_chapter.setOnClickListener {
-            if (goBackward(false, completion = {})) {
-                screenReader.previousResource()
-                play_pause.setImageResource(android.R.drawable.ic_media_pause)
-            }
-        }
-
-
         // SEARCH
         searchStorage = getSharedPreferences("org.readium.r2.search", Context.MODE_PRIVATE)
         searchResult = mutableListOf()
@@ -234,40 +190,6 @@ class EpubActivity : R2EpubActivity(), CoroutineScope, NavigatorDelegate/*, Visu
         search_listView.adapter = searchResultAdapter
         search_listView.layoutManager = LinearLayoutManager(this)
 
-    }
-
-
-    /**
-     * Pause the screenReader if view is paused.
-     */
-    override fun onPause() {
-        super.onPause()
-        screenReader.pauseReading()
-    }
-
-    /**
-     * Stop the screenReader if app is view is stopped.
-     */
-    override fun onStop() {
-        super.onStop()
-        screenReader.stopReading()
-    }
-
-    /**
-     * The function allows to access the [R2ScreenReader] instance and set the TextToSpeech speech speed.
-     * Values are limited between 0.25 and 3.0 included.
-     *
-     * @param speed: Float - The speech speed we wish to use with Android's TextToSpeech.
-     */
-    fun updateScreenReaderSpeed(speed: Float, restart: Boolean) {
-        var rSpeed = speed
-
-        if (speed < 0.25) {
-            rSpeed = 0.25.toFloat()
-        } else if (speed > 3.0) {
-            rSpeed = 3.0.toFloat()
-        }
-        screenReader.setSpeechSpeed(rSpeed, restart)
     }
 
     /**
@@ -457,38 +379,7 @@ class EpubActivity : R2EpubActivity(), CoroutineScope, NavigatorDelegate/*, Visu
                 userSettings.userSettingsPopUp().showAsDropDown(this.findViewById(R.id.settings), 0, 0, Gravity.END)
                 return true
             }
-            R.id.screen_reader -> {
-                if (!screenReader.isSpeaking && !screenReader.isPaused && item.title == resources.getString(R.string.epubactivity_read_aloud_start)) {
-
-                    //Get user settings speed when opening the screen reader. Get a neutral percentage (corresponding to
-                    //the normal speech speed) if no user settings exist.
-                    val speed = preferences.getInt("reader_TTS_speed",
-                            (2.75 * 3.toDouble() / 11.toDouble() * 100).toInt())
-                    //Convert percentage to a float value between 0.25 and 3.0
-                    val ttsSpeed = 0.25.toFloat() + (speed.toFloat() / 100.toFloat()) * 2.75.toFloat()
-
-                    updateScreenReaderSpeed(ttsSpeed, false)
-
-                    if (screenReader.goTo(resourcePager.currentItem)) {
-
-                        item.title = resources.getString(R.string.epubactivity_read_aloud_stop)
-                        tts_overlay.visibility = View.VISIBLE
-                        play_pause.setImageResource(android.R.drawable.ic_media_pause)
-                        allowToggleActionBar = false
-                    } else {
-                        Toast.makeText(applicationContext, "No further chapter contains text to read", Toast.LENGTH_LONG).show()
-                    }
-
-                } else {
-                    dismissScreenReader()
-                }
-
-                return true
-            }
             R.id.drm -> {
-                if (screenReader.isSpeaking) {
-                    dismissScreenReader()
-                }
                 startActivityForResult(intentFor<DRMManagementActivity>("publication" to publicationPath), 1)
                 return true
             }
@@ -901,30 +792,6 @@ class EpubActivity : R2EpubActivity(), CoroutineScope, NavigatorDelegate/*, Visu
             userSettings = UserSettings(preferences, this, publication.userSettingsUIPreset)
             userSettings.resourcePager = resourcePager
         }
-
-        if (this::screenReader.isInitialized) {
-            if (tts_overlay.visibility == View.VISIBLE) {
-                if (screenReader.currentResource != resourcePager.currentItem) {
-                    screenReader.goTo(resourcePager.currentItem)
-                }
-
-                if (screenReader.isPaused) {
-                    screenReader.resumeReading()
-                    play_pause.setImageResource(android.R.drawable.ic_media_pause)
-                } else {
-                    screenReader.pauseReading()
-                    play_pause.setImageResource(android.R.drawable.ic_media_play)
-                }
-                screenReader.onResume()
-            }
-        } else {
-            Handler().postDelayed({
-                val port = preferences.getString("$publicationIdentifier-publicationPort", 0.toString())?.toInt()
-                port?.let {
-                    screenReader = R2ScreenReader(this, this, this, publication, port, publicationFileName, resourcePager.currentItem)
-                }
-            }, 500)
-        }
     }
 
     /**
@@ -932,15 +799,15 @@ class EpubActivity : R2EpubActivity(), CoroutineScope, NavigatorDelegate/*, Visu
      * fed back to the user) and toggle the ActionBar if it is disabled and if the text to speech is invisible.
      */
     override fun toggleActionBar() {
-        val am = getSystemService(ACCESSIBILITY_SERVICE) as AccessibilityManager
-        isExploreByTouchEnabled = am.isTouchExplorationEnabled
-
-        if (!isExploreByTouchEnabled && tts_overlay.visibility == View.INVISIBLE) {
-            super.toggleActionBar()
-        }
-        launch(coroutineContext) {
-            mode?.finish()
-        }
+//        val am = getSystemService(ACCESSIBILITY_SERVICE) as AccessibilityManager
+//        isExploreByTouchEnabled = am.isTouchExplorationEnabled
+//
+//        if (!isExploreByTouchEnabled) {
+//            super.toggleActionBar()
+//        }
+//        launch(coroutineContext) {
+//            mode?.finish()
+//        }
     }
 
     /**
@@ -949,10 +816,6 @@ class EpubActivity : R2EpubActivity(), CoroutineScope, NavigatorDelegate/*, Visu
     override fun onDestroy() {
         super.onDestroy()
         activitiesLaunched.getAndDecrement()
-        try {
-            screenReader.shutdown()
-        } catch (e: Exception) {
-        }
     }
 
     /**
@@ -967,35 +830,8 @@ class EpubActivity : R2EpubActivity(), CoroutineScope, NavigatorDelegate/*, Visu
         }
     }
 
-    /**
-     * - Stop screenReader's reading.
-     * - Set the title of the menu's button for launching TTS to a value that indicates it was closed.
-     * - Make the TTS view invisible.
-     * - Update the TTS play/pause button to show the good resource picture.
-     * - Enable toggling the scrollbar which was previously disable for TTS.
-     */
-    override fun dismissScreenReader() {
-        super.dismissScreenReader()
-        screenReader.stopReading()
-        menuScreenReader?.title = resources.getString(R.string.epubactivity_read_aloud_start)
-        tts_overlay.visibility = View.INVISIBLE
-        play_pause.setImageResource(android.R.drawable.ic_media_play)
-        allowToggleActionBar = true
-    }
-
     override fun playTextChanged(text: String) {
         super.playTextChanged(text)
         findViewById<TextView>(R.id.tts_textView)?.text = text
-        TextViewCompat.setAutoSizeTextTypeUniformWithConfiguration(tts_textView!!, 1, 30, 1, TypedValue.COMPLEX_UNIT_DIP)
     }
-
-    override fun playStateChanged(playing: Boolean) {
-        super.playStateChanged(playing)
-        if (playing) {
-            play_pause?.setImageResource(android.R.drawable.ic_media_pause)
-        } else {
-            play_pause?.setImageResource(android.R.drawable.ic_media_play)
-        }
-    }
-
 }
