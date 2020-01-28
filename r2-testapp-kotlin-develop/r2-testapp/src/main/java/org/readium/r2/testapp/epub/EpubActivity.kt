@@ -148,6 +148,13 @@ class EpubActivity : R2EpubActivity(), CoroutineScope,
             }
         }, 100)
 
+        frame_top.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
+            override fun onGlobalLayout() {
+                frame_top.viewTreeObserver.removeOnGlobalLayoutListener(this)
+                frame_top.translationY = -frame_top.height.toFloat()
+            }
+        })
+
         val appearancePref = preferences.getInt(APPEARANCE_REF, 0)
         val backgroundsColors = mutableListOf("#ffffff", "#faf4e8", "#000000")
         val textColors = mutableListOf("#000000", "#000000", "#ffffff")
@@ -155,13 +162,13 @@ class EpubActivity : R2EpubActivity(), CoroutineScope,
         (resourcePager.focusedChild?.findViewById(org.readium.r2.navigator.R.id.book_title) as? TextView)?.setTextColor(
             Color.parseColor(textColors[appearancePref])
         )
-        toggleActionBar()
 
         resourcePager.offscreenPageLimit = 1
 
-        currentPagerPosition =
-            publication.readingOrder.indexOfFirst { it.href == currentLocation?.href }
-        resourcePager.currentItem = currentPagerPosition
+        //TODO set the users current page
+//        currentPagerPosition =
+//            publication.readingOrder.indexOfFirst { it.href == currentLocation?.href }
+//        resourcePager.currentItem = currentPagerPosition
 
         // SEARCH
         searchStorage = getSharedPreferences("org.readium.r2.search", Context.MODE_PRIVATE)
@@ -871,26 +878,12 @@ class EpubActivity : R2EpubActivity(), CoroutineScope,
      */
     override fun toggleActionBar() {
         launch {
-            if (frame_top.visibility == View.VISIBLE) {
-                frame_top.visibility = View.GONE
+            if (frame_top.translationY == -frame_top.height.toFloat()) {
+                frame_top.animate().translationY(0f).duration = ANIMATION_DURATION
             } else {
-                frame_top.visibility = View.VISIBLE
+                frame_top.animate().translationY(-frame_top.height.toFloat()).duration = ANIMATION_DURATION
             }
         }
-//        launch {
-//            if (supportActionBar!!.isShowing) {
-//                resourcePager.systemUiVisibility = (View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-//                        or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-//                        or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-//                        or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-//                        or View.SYSTEM_UI_FLAG_FULLSCREEN // hide status bar
-//                        or View.SYSTEM_UI_FLAG_IMMERSIVE)
-//            } else {
-//                resourcePager.systemUiVisibility = (View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-//                        or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-//                        or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN)
-//            }
-//        }
     }
 
     /**
@@ -916,5 +909,9 @@ class EpubActivity : R2EpubActivity(), CoroutineScope,
     override fun playTextChanged(text: String) {
         super.playTextChanged(text)
         findViewById<TextView>(R.id.tts_textView)?.text = text
+    }
+
+    companion object{
+        const val ANIMATION_DURATION = 200L
     }
 }
