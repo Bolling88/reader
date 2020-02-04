@@ -15,6 +15,13 @@
     <color name="colorAccent">#eceaeb</color>
     <color name="colorAccentPrefs">#070707</color>
     <color name="white">#ffffff</color>
+    <color name="grey">#7b7b7b</color>
+    <color name="grey_2">#dcdcdc</color>
+    <color name="grey_3">#c1c1c1</color>
+    <color name="sepia">#e8e0cc</color>
+    <color name="sepia_2">#564732</color>
+    <color name="black">#000000</color>
+    <color name="dark">#333333</color>
     <color name="orange">#ff6600</color>
 
 

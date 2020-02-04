@@ -64,25 +64,12 @@ class OverlayFragment : Fragment() {
                 binding.frameBottom.translationY = binding.frameBottom.height.toFloat()
             }
         })
-
-        binding.frameTop.constraintViewTop.skb_brightness.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-
-            override fun onProgressChanged(seekBar: SeekBar, i: Int, b: Boolean) {
-                // Display the current progress of SeekBar
-                viewModel.onBrightnessChanged(i)
-            }
-
-            override fun onStartTrackingTouch(seekBar: SeekBar) {
-            }
-
-            override fun onStopTrackingTouch(seekBar: SeekBar) {
-            }
-        })
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         viewModel = ViewModelProviders.of(this).get(OverlayViewModel::class.java)
+        viewModel.passResources(resources)
         binding.lifecycleOwner = viewLifecycleOwner
         binding.viewModel = viewModel
 

@@ -101,10 +101,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dip"
-            android:textSize="16sp"
-            android:textColor="@color/orange"
-            android:text="@string/done"
             android:layout_marginEnd="20dip"
+            android:text="@string/done"
+            android:textColor="@color/orange"
+            android:textSize="16sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -139,27 +139,37 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/img_theme" />
 
-        <androidx.appcompat.widget.AppCompatTextView
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/txt_light"
-            android:layout_width="wrap_content"
+            android:layout_width="0dip"
             android:layout_height="wrap_content"
+            android:layout_marginStart="20dip"
             android:layout_marginTop="12dip"
             android:layout_marginBottom="36dip"
+            android:background="@drawable/button_light"
             android:text="@string/aa"
+            android:textAllCaps="false"
+            android:onClick="@{()-> viewModel.onStyleLightClicked()}"
+            android:textColor="@color/dark"
+            android:layout_marginEnd="5dip"
             android:textSize="16sp"
-            android:layout_marginStart="20dip"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/txt_sepia"
             app:layout_constraintHorizontal_chainStyle="spread_inside"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/txt_theme" />
 
-        <androidx.appcompat.widget.AppCompatTextView
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/txt_sepia"
-            android:layout_width="wrap_content"
+            android:layout_width="0dip"
             android:layout_height="wrap_content"
             android:layout_marginBottom="36dip"
+            android:background="@drawable/button_sepia"
             android:text="@string/aa"
+            android:layout_marginEnd="5dip"
+            android:layout_marginStart="5dip"
+            android:textColor="@color/sepia_2"
+            android:onClick="@{()-> viewModel.onStyleSepiaClicked()}"
             android:textSize="16sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/txt_dark"
@@ -167,12 +177,17 @@
             app:layout_constraintTop_toBottomOf="@+id/txt_light"
             app:layout_constraintTop_toTopOf="@+id/txt_light" />
 
-        <androidx.appcompat.widget.AppCompatTextView
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/txt_dark"
-            android:layout_width="wrap_content"
+            android:layout_width="0dip"
             android:layout_height="wrap_content"
             android:layout_marginBottom="36dip"
+            android:background="@drawable/button_dark"
             android:text="@string/aa"
+            android:layout_marginEnd="5dip"
+            android:layout_marginStart="5dip"
+            android:textColor="@color/grey_3"
+            android:onClick="@{()-> viewModel.onStyleDarkClicked()}"
             android:textSize="16sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/txt_night"
@@ -180,13 +195,17 @@
             app:layout_constraintTop_toBottomOf="@+id/txt_light"
             app:layout_constraintTop_toTopOf="@+id/txt_light" />
 
-        <androidx.appcompat.widget.AppCompatTextView
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/txt_night"
-            android:layout_width="wrap_content"
+            android:layout_width="0dip"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="36dip"
             android:layout_marginEnd="20dip"
+            android:layout_marginStart="5dip"
+            android:layout_marginBottom="36dip"
+            android:background="@drawable/button_night"
             android:text="@string/aa"
+            android:textColor="@color/grey_2"
+            android:onClick="@{()-> viewModel.onStyleNightClicked()}"
             android:textSize="16sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

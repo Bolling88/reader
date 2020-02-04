@@ -1,10 +1,11 @@
 package org.readium.r2.testapp.epub.fragment
 
-import android.util.Log
-import android.view.View
+import android.content.res.Resources
+import android.graphics.drawable.Drawable
 import android.widget.SeekBar
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import org.readium.r2.testapp.R
 
 
 class OverlayViewModel : ViewModel() {
@@ -15,16 +16,30 @@ class OverlayViewModel : ViewModel() {
     val observableAnimateShowTheme = SingleLiveEvent<Unit>()
 
     val liveTextPageInfo = MutableLiveData<String>()
-    val liveTextDoneVisibility = MutableLiveData<Int>()
+    val liveButtonLightBackground = MutableLiveData<Drawable>()
+    val liveButtonSepiaBackground = MutableLiveData<Drawable>()
+    val liveButtonDarkBackground = MutableLiveData<Drawable>()
+    val liveButtonNightBackground = MutableLiveData<Drawable>()
 
     init {
-        liveTextDoneVisibility.postValue(View.GONE)
+    }
+
+    private lateinit var resources: Resources
+
+    //TODO refactor away and use resource util
+    fun passResources(resources: Resources){
+        this.resources = resources
+        onStyleLightClicked()
     }
 
     fun onPageSeekChanged(seekBar: SeekBar?, progresValue: Int, fromUser: Boolean) {
-        Log.d("seek", "value $progresValue")
         observableSetCurrentPage.postValue(progresValue)
         liveTextPageInfo.postValue("$progresValue / $totalPages")
+    }
+
+    fun onBrightnessSeekChanged(seekBar: SeekBar?, progresValue: Int, fromUser: Boolean) {
+        val backLightValue = progresValue.toFloat() / 100
+        observableBrightness.postValue(backLightValue)
     }
 
     fun setTotalPages(childCount: Int) {
@@ -43,25 +58,31 @@ class OverlayViewModel : ViewModel() {
         observableAnimateShowTheme.call()
     }
 
-    fun onBrightnessChanged(value: Int) {
-        val backLightValue = value.toFloat() / 100
-        Log.d("Backlight", "$backLightValue")
-        observableBrightness.postValue(backLightValue)
-    }
-
     fun onStyleLightClicked(){
-
+        liveButtonLightBackground.postValue(resources.getDrawable(R.drawable.button_light_selected))
+        liveButtonSepiaBackground.postValue(resources.getDrawable(R.drawable.button_sepia))
+        liveButtonDarkBackground.postValue(resources.getDrawable(R.drawable.button_dark))
+        liveButtonNightBackground.postValue(resources.getDrawable(R.drawable.button_night))
     }
 
     fun onStyleSepiaClicked(){
-
+        liveButtonLightBackground.postValue(resources.getDrawable(R.drawable.button_light))
+        liveButtonSepiaBackground.postValue(resources.getDrawable(R.drawable.button_sepia_selected))
+        liveButtonDarkBackground.postValue(resources.getDrawable(R.drawable.button_dark))
+        liveButtonNightBackground.postValue(resources.getDrawable(R.drawable.button_night))
     }
 
     fun onStyleDarkClicked(){
-
+        liveButtonLightBackground.postValue(resources.getDrawable(R.drawable.button_light))
+        liveButtonSepiaBackground.postValue(resources.getDrawable(R.drawable.button_sepia))
+        liveButtonDarkBackground.postValue(resources.getDrawable(R.drawable.button_dark_selected))
+        liveButtonNightBackground.postValue(resources.getDrawable(R.drawable.button_night))
     }
 
     fun onStyleNightClicked(){
-
+        liveButtonLightBackground.postValue(resources.getDrawable(R.drawable.button_light))
+        liveButtonSepiaBackground.postValue(resources.getDrawable(R.drawable.button_sepia))
+        liveButtonDarkBackground.postValue(resources.getDrawable(R.drawable.button_dark))
+        liveButtonNightBackground.postValue(resources.getDrawable(R.drawable.button_night_selected))
     }
 }
