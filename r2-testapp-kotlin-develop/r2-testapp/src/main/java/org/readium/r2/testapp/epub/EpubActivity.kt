@@ -88,7 +88,7 @@ class EpubActivity : R2EpubActivity(), CoroutineScope,
     fun updateAppearance(value: Int){
         var ref = userSettings.userProperties.getByRef<Enumerable>(APPEARANCE_REF)
         ref.index = value
-       // userSettings.updateEnumerable(value)
+        userSettings.updateEnumerable(ref)
         userSettings.updateViewCSS(APPEARANCE_REF)
     }
 
