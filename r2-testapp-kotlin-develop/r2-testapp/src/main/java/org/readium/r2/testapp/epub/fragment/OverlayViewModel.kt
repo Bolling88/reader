@@ -48,4 +48,20 @@ class OverlayViewModel : ViewModel() {
         Log.d("Backlight", "$backLightValue")
         observableBrightness.postValue(backLightValue)
     }
+
+    fun onStyleLightClicked(){
+
+    }
+
+    fun onStyleSepiaClicked(){
+
+    }
+
+    fun onStyleDarkClicked(){
+
+    }
+
+    fun onStyleNightClicked(){
+
+    }
 }
