@@ -183,21 +183,6 @@ class EpubActivity : R2EpubActivity(), CoroutineScope,
             }
         })
 
-        val appearancePref = preferences.getInt(APPEARANCE_REF, 0)
-        val backgroundsColors = mutableListOf("#ffffff", "#faf4e8", "#000000")
-        val textColors = mutableListOf("#000000", "#000000", "#ffffff")
-        resourcePager.setBackgroundColor(Color.parseColor(backgroundsColors[appearancePref]))
-        (resourcePager.focusedChild?.findViewById(org.readium.r2.navigator.R.id.book_title) as? TextView)?.setTextColor(
-            Color.parseColor(textColors[appearancePref])
-        )
-
-        resourcePager.offscreenPageLimit = 1
-
-        //TODO set the users current page
-//        currentPagerPosition =
-//            publication.readingOrder.indexOfFirst { it.href == currentLocation?.href }
-//        resourcePager.currentItem = currentPagerPosition
-
         // SEARCH
         searchStorage = getSharedPreferences("org.readium.r2.search", Context.MODE_PRIVATE)
         searchResult = mutableListOf()
