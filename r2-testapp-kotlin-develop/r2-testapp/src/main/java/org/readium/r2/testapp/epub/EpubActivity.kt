@@ -85,6 +85,12 @@ class EpubActivity : R2EpubActivity(), CoroutineScope,
         booksDB.books.saveProgression(locator, bookId)
     }
 
+    fun updateAppearance(value: Int){
+        var ref = userSettings.userProperties.getByRef<Enumerable>(APPEARANCE_REF)
+        ref.index = value
+       // userSettings.updateEnumerable(value)
+        userSettings.updateViewCSS(APPEARANCE_REF)
+    }
 
     /**
      * Context of this scope.

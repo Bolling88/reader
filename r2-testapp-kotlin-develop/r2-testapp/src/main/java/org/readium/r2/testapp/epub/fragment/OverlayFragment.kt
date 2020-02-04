@@ -7,15 +7,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
-import android.widget.SeekBar
 import androidx.appcompat.app.AppCompatActivity
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.transition.TransitionManager
-import kotlinx.android.synthetic.main.include_ebook_display.view.*
-import org.jetbrains.anko.sdk25.coroutines.onSeekBarChangeListener
 import org.readium.r2.testapp.R
 import org.readium.r2.testapp.databinding.FragmentOverlayBinding
 import org.readium.r2.testapp.epub.EpubActivity
@@ -91,6 +87,12 @@ class OverlayFragment : Fragment() {
                 setBrightness(it)
             }
         })
+
+        viewModel.observableSetPageColor.observe(viewLifecycleOwner, Observer {
+            it?.let {
+                (activity as EpubActivity).updateAppearance(it)
+            }
+        })
     }
 
     fun onCenterClicked() {
@@ -117,7 +119,7 @@ class OverlayFragment : Fragment() {
         viewModel.onPageSelected(position)
     }
 
-    private fun setBrightness(value: Float){
+    private fun setBrightness(value: Float) {
         val layoutParams = (context as AppCompatActivity).window.attributes
         layoutParams.screenBrightness = value
         activity?.window?.attributes = layoutParams

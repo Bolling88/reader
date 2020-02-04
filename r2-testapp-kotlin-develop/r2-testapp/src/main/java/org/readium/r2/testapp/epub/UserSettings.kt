@@ -42,7 +42,7 @@ class UserSettings(var preferences: SharedPreferences, val context: Context, pri
     private var fontSize = 100f
     private var fontOverride = false
     private var fontFamily = 0
-    private var appearance = 0
+    internal var appearance = 0
     private var verticalScroll = false
 
     //Advanced settings
@@ -54,7 +54,7 @@ class UserSettings(var preferences: SharedPreferences, val context: Context, pri
     private var pageMargins = 2f
     private var lineHeight = 1f
 
-    private var userProperties: UserProperties
+    var userProperties: UserProperties
 
     init {
         appearance = preferences.getInt(APPEARANCE_REF, appearance)
@@ -132,7 +132,7 @@ class UserSettings(var preferences: SharedPreferences, val context: Context, pri
         }
     }
 
-    private fun updateEnumerable(enumerable: Enumerable) {
+    fun updateEnumerable(enumerable: Enumerable) {
         preferences.edit().putInt(enumerable.ref, enumerable.index).apply()
         saveChanges()
     }

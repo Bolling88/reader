@@ -12,6 +12,7 @@ class OverlayViewModel : ViewModel() {
 
     private var totalPages: Int = 0
     val observableSetCurrentPage = MutableLiveData<Int>()
+    val observableSetPageColor = MutableLiveData<Int>()
     val observableBrightness = MutableLiveData<Float>()
     val observableAnimateShowTheme = SingleLiveEvent<Unit>()
 
@@ -27,7 +28,7 @@ class OverlayViewModel : ViewModel() {
     private lateinit var resources: Resources
 
     //TODO refactor away and use resource util
-    fun passResources(resources: Resources){
+    fun passResources(resources: Resources) {
         this.resources = resources
         onStyleLightClicked()
     }
@@ -50,39 +51,53 @@ class OverlayViewModel : ViewModel() {
         liveTextPageInfo.postValue("$position / $totalPages")
     }
 
-    fun onThemeClicked(){
+    fun onThemeClicked() {
         observableAnimateShowTheme.call()
     }
 
-    fun onDoneClicked(){
+    fun onDoneClicked() {
         observableAnimateShowTheme.call()
     }
 
-    fun onStyleLightClicked(){
+    fun onStyleLightClicked() {
         liveButtonLightBackground.postValue(resources.getDrawable(R.drawable.button_light_selected))
         liveButtonSepiaBackground.postValue(resources.getDrawable(R.drawable.button_sepia))
         liveButtonDarkBackground.postValue(resources.getDrawable(R.drawable.button_dark))
         liveButtonNightBackground.postValue(resources.getDrawable(R.drawable.button_night))
+
+        observableSetPageColor.postValue(AppearanceMode.NORMAL.value)
     }
 
-    fun onStyleSepiaClicked(){
+    fun onStyleSepiaClicked() {
         liveButtonLightBackground.postValue(resources.getDrawable(R.drawable.button_light))
         liveButtonSepiaBackground.postValue(resources.getDrawable(R.drawable.button_sepia_selected))
         liveButtonDarkBackground.postValue(resources.getDrawable(R.drawable.button_dark))
         liveButtonNightBackground.postValue(resources.getDrawable(R.drawable.button_night))
+
+        observableSetPageColor.postValue(AppearanceMode.SEPIA.value)
     }
 
-    fun onStyleDarkClicked(){
+    fun onStyleDarkClicked() {
         liveButtonLightBackground.postValue(resources.getDrawable(R.drawable.button_light))
         liveButtonSepiaBackground.postValue(resources.getDrawable(R.drawable.button_sepia))
         liveButtonDarkBackground.postValue(resources.getDrawable(R.drawable.button_dark_selected))
         liveButtonNightBackground.postValue(resources.getDrawable(R.drawable.button_night))
+
+        observableSetPageColor.postValue(R.color.dark)
     }
 
-    fun onStyleNightClicked(){
+    fun onStyleNightClicked() {
         liveButtonLightBackground.postValue(resources.getDrawable(R.drawable.button_light))
         liveButtonSepiaBackground.postValue(resources.getDrawable(R.drawable.button_sepia))
         liveButtonDarkBackground.postValue(resources.getDrawable(R.drawable.button_dark))
         liveButtonNightBackground.postValue(resources.getDrawable(R.drawable.button_night_selected))
+
+        observableSetPageColor.postValue(AppearanceMode.NIGHT.value)
+    }
+
+    enum class AppearanceMode(val value: Int) {
+        NORMAL(0),
+        SEPIA(1),
+        NIGHT(2)
     }
 }
