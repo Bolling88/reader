@@ -27,8 +27,10 @@ import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.viewpager.widget.ViewPager
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.activity_epub.*
+import kotlinx.android.synthetic.main.filter_row.view.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -153,6 +155,28 @@ class EpubActivity : R2EpubActivity(), CoroutineScope,
             }
         }, 100)
 
+        resourcePager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
+
+            override fun onPageScrollStateChanged(state: Int) {
+                // Do nothing
+            }
+
+            override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
+                // Do nothing
+            }
+
+            override fun onPageSelected(position: Int) {
+                val resource = publication.readingOrder[resourcePager.currentItem]
+                val resourceHref = resource.href ?: ""
+                val currentPage = positionsDB.positions.getCurrentPage(
+                    bookId,
+                    resourceHref,
+                    currentLocation?.locations?.progression!!
+                )
+                overlayFragment.onPageSelected(currentPage?.toInt() ?: 0)
+            }
+        })
+
         val appearancePref = preferences.getInt(APPEARANCE_REF, 0)
         val backgroundsColors = mutableListOf("#ffffff", "#faf4e8", "#000000")
         val textColors = mutableListOf("#000000", "#000000", "#ffffff")
@@ -200,6 +224,11 @@ class EpubActivity : R2EpubActivity(), CoroutineScope,
         search_listView.adapter = searchResultAdapter
         search_listView.layoutManager = LinearLayoutManager(this)
 
+    }
+
+    override fun onPostCreate(savedInstanceState: Bundle?) {
+        super.onPostCreate(savedInstanceState)
+        overlayFragment.setTotalPages(resourcePager.adapter?.count ?: 0)
     }
 
     /**
@@ -453,7 +482,6 @@ class EpubActivity : R2EpubActivity(), CoroutineScope,
             R.id.search -> {
                 search_overlay.visibility = View.VISIBLE
                 resourcePager.offscreenPageLimit = publication.readingOrder.size
-
                 val searchView = menuSearch?.actionView as SearchView
 
                 searchView.clearFocus()

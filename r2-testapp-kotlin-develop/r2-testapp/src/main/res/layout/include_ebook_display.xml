@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
 
@@ -8,8 +9,7 @@
             type="org.readium.r2.testapp.epub.fragment.OverlayViewModel" />
     </data>
 
-    <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraint_view_top"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -23,6 +23,7 @@
             android:layout_marginStart="20dip"
             android:layout_marginTop="20dip"
             android:layout_marginBottom="20dip"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -33,6 +34,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="20dip"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -44,6 +46,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="20dip"
             android:layout_marginEnd="20dip"
+            android:visibility="gone"
             app:layout_constraintEnd_toStartOf="@+id/img_more"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/ic_bookmark" />
@@ -53,6 +56,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="20dip"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/img_bookmarks"
             app:layout_constraintTop_toTopOf="parent"
@@ -63,6 +67,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="20dip"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/img_style"
             app:layout_constraintTop_toTopOf="parent"
@@ -70,17 +75,15 @@
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/img_theme"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="20dip"
-            android:onClick="@{() -> viewModel.onThemeClicked()}"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/img_search"
-            app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/ic_sun" />
+            android:layout_width="10dip"
+            android:layout_height="10dip"
+            android:layout_marginStart="20dip"
+            android:layout_marginTop="30dip"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/txt_title"
+            app:srcCompat="@drawable/ic_small_sun" />
 
         <!-- //Original toolbar content-->
-
         <!-- //Theme content-->
 
         <androidx.appcompat.widget.AppCompatTextView
@@ -89,7 +92,6 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="20dip"
             android:text="@string/brightness"
-            android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -99,8 +101,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dip"
-             android:visibility="gone"
-            android:onClick="@{() -> viewModel.onDoneClicked()}"
             android:textSize="16sp"
             android:textColor="@color/orange"
             android:text="@string/done"
@@ -113,7 +113,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="20dip"
-            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="@+id/img_theme"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@+id/img_theme"
@@ -125,10 +124,6 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="20dip"
             android:layout_marginEnd="20dip"
-            android:min="1"
-            android:max="100"
-            android:progress="50"
-            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="@+id/img_theme"
             app:layout_constraintEnd_toStartOf="@+id/img_sun"
             app:layout_constraintStart_toEndOf="@+id/img_theme"
@@ -141,7 +136,6 @@
             android:layout_marginStart="20dip"
             android:layout_marginTop="30dip"
             android:text="@string/theme"
-            android:visibility="gone"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/img_theme" />
 
@@ -149,12 +143,11 @@
             android:id="@+id/txt_light"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="20dip"
             android:layout_marginTop="12dip"
             android:layout_marginBottom="36dip"
             android:text="@string/aa"
             android:textSize="16sp"
-            android:visibility="gone"
+            android:layout_marginStart="20dip"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/txt_sepia"
             app:layout_constraintHorizontal_chainStyle="spread_inside"
@@ -168,7 +161,6 @@
             android:layout_marginBottom="36dip"
             android:text="@string/aa"
             android:textSize="16sp"
-            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/txt_dark"
             app:layout_constraintStart_toEndOf="@+id/txt_light"
@@ -182,7 +174,6 @@
             android:layout_marginBottom="36dip"
             android:text="@string/aa"
             android:textSize="16sp"
-            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/txt_night"
             app:layout_constraintStart_toEndOf="@+id/txt_sepia"
@@ -193,16 +184,16 @@
             android:id="@+id/txt_night"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="20dip"
             android:layout_marginBottom="36dip"
+            android:layout_marginEnd="20dip"
             android:text="@string/aa"
             android:textSize="16sp"
-            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/txt_dark"
             app:layout_constraintTop_toBottomOf="@+id/txt_light"
             app:layout_constraintTop_toTopOf="@+id/txt_light" />
+
         <!-- //Theme content-->
 
     </androidx.constraintlayout.widget.ConstraintLayout>

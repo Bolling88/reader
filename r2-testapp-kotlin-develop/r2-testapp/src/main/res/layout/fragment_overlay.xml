@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:app="http://schemas.android.com/apk/res-auto">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <data>
 
@@ -8,57 +10,50 @@
             type="org.readium.r2.testapp.epub.fragment.OverlayViewModel" />
     </data>
 
-    <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:bind="http://schemas.android.com/tools"
-        xmlns:tools="http://schemas.android.com/tools"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context="org.readium.r2.testapp.epub.fragment.OverlayFragment">
 
-        <FrameLayout
+        <include
             android:id="@+id/frame_top"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/colorAccent"
+            layout="@layout/include_ebook_toolbar"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <include
-                layout="@layout/include_ebook_toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                bind:viewModel="@{viewModel}" />
-        </FrameLayout>
+            app:layout_constraintTop_toTopOf="parent"
+            tools:viewModel="@{viewModel}" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/frame_bottom"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/colorAccent"
+            android:elevation="4dip"
+            android:background="@drawable/bg_rounded_white"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent">
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:layout_width="wrap_content"
-                app:layout_constraintBottom_toTopOf="@+id/img_more"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="22dip"
-                app:layout_constraintTop_toTopOf="parent"
                 android:layout_marginBottom="18dip"
                 android:text="The wise mans fear"
-                android:layout_height="wrap_content" />
+                app:layout_constraintBottom_toTopOf="@+id/img_more"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <androidx.appcompat.widget.AppCompatSeekBar
+                android:id="@+id/seek_pages"
                 android:layout_width="0dip"
                 android:layout_height="wrap_content"
-                app:layout_constraintBottom_toBottomOf="@+id/img_more"
-                app:layout_constraintEnd_toEndOf="parent"
                 android:layout_marginStart="15dip"
+                android:thumb="@drawable/ic_handle"
                 android:layout_marginEnd="15dip"
                 android:onProgressChanged="@{viewModel.onPageSeekChanged}"
+                app:layout_constraintBottom_toBottomOf="@+id/img_more"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/img_more"
                 app:layout_constraintTop_toTopOf="@+id/img_more" />
 
@@ -70,14 +65,14 @@
                 android:layout_marginBottom="18dip"
                 app:layout_constraintBottom_toTopOf="@+id/txt_chapter"
                 app:layout_constraintStart_toStartOf="parent"
-                app:srcCompat="@drawable/icon_left" />
+                app:srcCompat="@drawable/ic_hamburger" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/txt_page"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="40dip"
-                android:text="7 av 199"
+                android:text="@{viewModel.liveTextPageInfo}"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent" />

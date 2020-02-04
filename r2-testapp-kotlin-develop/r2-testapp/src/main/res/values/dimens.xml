@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <dimen name="rounded_rect_radius_big" tools:ignore="MissingDefaultResource">20dip</dimen>
+</resources>
