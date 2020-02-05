@@ -20,7 +20,7 @@ class OverlayFragment : Fragment() {
 
     private lateinit var constraintSet2: ConstraintSet
     private lateinit var constraintSet1: ConstraintSet
-    var changed = false
+    private var changed = false
     private lateinit var binding: FragmentOverlayBinding
 
     private lateinit var viewModel: OverlayViewModel
