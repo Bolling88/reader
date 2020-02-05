@@ -249,7 +249,7 @@ open class LibraryActivity : AppCompatActivity(), BooksAdapter.RecyclerViewClick
             }
         }
 
-        parseIntentPublication("http://www.gutenberg.org/cache/epub/61253/pg61253.epub")
+        //parseIntentPublication("http://www.gutenberg.org/cache/epub/61253/pg61253.epub")
     }
 
     override fun onResume() {

@@ -15,6 +15,7 @@ class OverlayViewModel : ViewModel() {
     val observableSetPageColor = MutableLiveData<Int>()
     val observableBrightness = MutableLiveData<Float>()
     val observableAnimateShowTheme = SingleLiveEvent<Unit>()
+    val observableOnBackPressed = SingleLiveEvent<Unit>()
 
     val liveTextPageInfo = MutableLiveData<String>()
     val liveButtonLightBackground = MutableLiveData<Drawable>()
@@ -57,6 +58,10 @@ class OverlayViewModel : ViewModel() {
 
     fun onDoneClicked() {
         observableAnimateShowTheme.call()
+    }
+
+    fun onCloseClicked(){
+        observableOnBackPressed.call()
     }
 
     fun onStyleLightClicked() {

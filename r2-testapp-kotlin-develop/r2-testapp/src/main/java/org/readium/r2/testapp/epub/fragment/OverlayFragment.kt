@@ -93,6 +93,10 @@ class OverlayFragment : Fragment() {
                 (activity as EpubActivity).updateAppearance(it)
             }
         })
+
+        viewModel.observableOnBackPressed.observe(viewLifecycleOwner, Observer {
+            activity?.onBackPressed()
+        })
     }
 
     fun onCenterClicked() {
