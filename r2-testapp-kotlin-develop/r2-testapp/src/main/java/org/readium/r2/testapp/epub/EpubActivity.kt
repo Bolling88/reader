@@ -61,28 +61,10 @@ import org.readium.r2.testapp.search.SearchLocatorAdapter
 import timber.log.Timber
 import kotlin.coroutines.CoroutineContext
 
-class EpubActivity : R2EpubActivity(), CoroutineScope,
-    NavigatorDelegate/*, VisualNavigatorDelegate, OutlineTableViewControllerDelegate*/ {
-
-    override val currentLocation: Locator?
-        get() {
-            return booksDB.books.currentLocator(bookId)?.let {
-                it
-            } ?: run {
-                val resource = publication.readingOrder[resourcePager.currentItem]
-                val resourceHref = resource.href ?: ""
-                val resourceType = resource.typeLink ?: ""
-                Locator(
-                    resourceHref,
-                    resourceType,
-                    publication.metadata.title,
-                    Locations(progression = 0.0)
-                )
-            }
-        }
+class EpubActivity : R2EpubActivity(), NavigatorDelegate {
 
     override fun locationDidChange(navigator: Navigator?, locator: Locator) {
-        booksDB.books.saveProgression(locator, bookId)
+       //save progression here
     }
 
     fun updateAppearance(value: Int) {
@@ -104,12 +86,6 @@ class EpubActivity : R2EpubActivity(), CoroutineScope,
         }
     }
 
-    /**
-     * Context of this scope.
-     */
-    override val coroutineContext: CoroutineContext
-        get() = Dispatchers.Main
-
     //UserSettings
     private lateinit var userSettings: UserSettings
 
@@ -120,25 +96,7 @@ class EpubActivity : R2EpubActivity(), CoroutineScope,
     private var isExploreByTouchEnabled = false
     private var pageEnded = false
 
-    // Provide access to the Bookmarks & Positions Databases
-    private lateinit var booksDB: BooksDatabase
-    private lateinit var positionsDB: PositionsDatabase
-    private lateinit var highlightDB: HighligtsDatabase
-
     private var menuDrm: MenuItem? = null
-    private var menuToc: MenuItem? = null
-    private var menuBmk: MenuItem? = null
-    private var menuSearch: MenuItem? = null
-
-    private var menuScreenReader: MenuItem? = null
-
-    private var searchTerm = ""
-    private lateinit var searchStorage: SharedPreferences
-    private lateinit var searchResultAdapter: SearchLocatorAdapter
-    private lateinit var searchResult: MutableList<SearchLocator>
-
-    private var mode: ActionMode? = null
-    private var popupWindow: PopupWindow? = null
 
     override var allowToggleActionBar = true
 
@@ -158,10 +116,6 @@ class EpubActivity : R2EpubActivity(), CoroutineScope,
 
         overlayFragment =
             supportFragmentManager.findFragmentById(R.id.fragment_overlay) as OverlayFragment
-
-        booksDB = BooksDatabase(this)
-        positionsDB = PositionsDatabase(this)
-        highlightDB = HighligtsDatabase(this)
 
         navigatorDelegate = this
         bookId = intent.getLongExtra("bookId", -1)
@@ -188,13 +142,7 @@ class EpubActivity : R2EpubActivity(), CoroutineScope,
 
             override fun onPageSelected(position: Int) {
                 val resource = publication.readingOrder[resourcePager.currentItem]
-                val resourceHref = resource.href ?: ""
-                val currentPage = positionsDB.positions.getCurrentPage(
-                    bookId,
-                    resourceHref,
-                    currentLocation?.locations?.progression!!
-                )
-                overlayFragment.onPageSelected(currentPage?.toInt() ?: 0)
+                //here chapter have changed
             }
         })
     }
