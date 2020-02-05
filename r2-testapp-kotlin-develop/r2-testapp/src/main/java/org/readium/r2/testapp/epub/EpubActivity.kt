@@ -121,7 +121,6 @@ class EpubActivity : R2EpubActivity(), CoroutineScope,
     private var pageEnded = false
 
     // Provide access to the Bookmarks & Positions Databases
-    private lateinit var bookmarksDB: BookmarksDatabase
     private lateinit var booksDB: BooksDatabase
     private lateinit var positionsDB: PositionsDatabase
     private lateinit var highlightDB: HighligtsDatabase
@@ -159,7 +158,6 @@ class EpubActivity : R2EpubActivity(), CoroutineScope,
 
         overlayFragment = supportFragmentManager.findFragmentById(R.id.fragment_overlay) as OverlayFragment
 
-        bookmarksDB = BookmarksDatabase(this)
         booksDB = BooksDatabase(this)
         positionsDB = PositionsDatabase(this)
         highlightDB = HighligtsDatabase(this)
@@ -383,126 +381,6 @@ class EpubActivity : R2EpubActivity(), CoroutineScope,
         }
 
         return true
-    }
-
-    /**
-     * Management of the menu bar.
-     *
-     * When (TOC):
-     *   - Open TOC activity for current publication.
-     *
-     * When (Settings):
-     *   - Show settings view as a dropdown menu starting from the clicked button
-     *
-     * When (Screen Reader):
-     *   - Switch screen reader on or off.
-     *   - If screen reader was off, get reading speed from preferences, update reading speed and sync it with the
-     *       active section in the webView.
-     *   - If screen reader was on, dismiss it.
-     *
-     * When (DRM):
-     *   - Dismiss screen reader if it was on
-     *   - Start the DRM management activity.
-     *
-     * When (Bookmark):
-     *   - Create a bookmark marking the current page and insert it inside the database.
-     *
-     * When (Search):
-     *   - Make the search overlay visible.
-     *
-     * When (Home):
-     *   - Make the search view invisible.
-     *
-     * @param item: MenuItem - The button that was pressed.
-     * @return Boolean - Return true if the button has a switch case. Return false otherwise.
-     */
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-
-            R.id.toc -> {
-                val intent = Intent(this, R2OutlineActivity::class.java)
-                intent.putExtra("publication", publication)
-                intent.putExtra("bookId", bookId)
-                startActivityForResult(intent, 2)
-                return true
-            }
-            R.id.settings -> {
-                userSettings.userSettingsPopUp()
-                    .showAsDropDown(this.findViewById(R.id.settings), 0, 0, Gravity.END)
-                return true
-            }
-            R.id.drm -> {
-                startActivityForResult(
-                    intentFor<DRMManagementActivity>("publication" to publicationPath),
-                    1
-                )
-                return true
-            }
-            R.id.bookmark -> {
-                val resourceIndex = resourcePager.currentItem.toLong()
-                val resource = publication.readingOrder[resourcePager.currentItem]
-                val resourceHref = resource.href ?: ""
-                val resourceType = resource.typeLink ?: ""
-                val resourceTitle = resource.title ?: ""
-                val currentPage = positionsDB.positions.getCurrentPage(
-                    bookId,
-                    resourceHref,
-                    currentLocation?.locations?.progression!!
-                )?.let {
-                    it
-                }
-
-                val bookmark = Bookmark(
-                    bookId,
-                    publicationIdentifier,
-                    resourceIndex,
-                    resourceHref,
-                    resourceType,
-                    resourceTitle,
-                    Locations(
-                        progression = currentLocation?.locations?.progression,
-                        position = currentPage
-                    ),
-                    LocatorText()
-                )
-
-                bookmarksDB.bookmarks.insert(bookmark)?.let {
-                    launch {
-                        currentPage?.let {
-                            toast("Bookmark added at page $currentPage")
-                        } ?: run {
-                            toast("Bookmark added")
-                        }
-                    }
-                } ?: run {
-                    launch {
-                        toast("Bookmark already exists")
-                    }
-                }
-
-                return true
-            }
-            R.id.search -> {
-                search_overlay.visibility = View.VISIBLE
-                resourcePager.offscreenPageLimit = publication.readingOrder.size
-                val searchView = menuSearch?.actionView as SearchView
-
-                searchView.clearFocus()
-
-                return super.onOptionsItemSelected(item)
-            }
-
-            android.R.id.home -> {
-                search_overlay.visibility = View.INVISIBLE
-                resourcePager.offscreenPageLimit = 1
-                val searchView = menuSearch?.actionView as SearchView
-                searchView.clearFocus()
-                return true
-            }
-
-            else -> return super.onOptionsItemSelected(item)
-        }
-
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
