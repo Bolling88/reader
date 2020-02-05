@@ -11,6 +11,7 @@
 package org.readium.r2.testapp.permissions
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
@@ -27,6 +28,7 @@ class PermissionHelper(private val activity: Activity, private val permissions: 
     private val PERMISSION = Manifest.permission.WRITE_EXTERNAL_STORAGE
     private val permissionDialogConfirmed = PublishSubject.create<Unit>()
 
+    @SuppressLint("CheckResult")
     fun storagePermission(gotPermission: () -> Unit = {}) {
         val root = activity.findViewById<View>(android.R.id.content)
         permissions.request(PERMISSION)

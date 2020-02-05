@@ -67,7 +67,6 @@ import org.readium.r2.streamer.parser.divina.DiViNaConstant
 import org.readium.r2.streamer.parser.divina.DiViNaParser
 import org.readium.r2.streamer.parser.epub.EPUBConstant
 import org.readium.r2.streamer.parser.epub.EpubParser
-import org.readium.r2.streamer.server.BASE_URL
 import org.readium.r2.streamer.server.Server
 import org.readium.r2.testapp.BuildConfig.DEBUG
 import org.readium.r2.testapp.R
@@ -79,7 +78,6 @@ import org.readium.r2.testapp.opds.OPDSDownloader
 import org.readium.r2.testapp.permissions.PermissionHelper
 import org.readium.r2.testapp.permissions.Permissions
 import org.readium.r2.testapp.utils.ContentResolverUtil
-import org.readium.r2.testapp.utils.R2IntentHelper
 import org.readium.r2.testapp.utils.toFile
 import org.zeroturnaround.zip.ZipUtil
 import timber.log.Timber
