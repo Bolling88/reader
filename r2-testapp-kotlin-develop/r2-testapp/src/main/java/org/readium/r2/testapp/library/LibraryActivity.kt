@@ -74,7 +74,6 @@ import org.readium.r2.testapp.R
 import org.readium.r2.testapp.db.*
 import org.readium.r2.testapp.drm.LCPLibraryActivityService
 import org.readium.r2.testapp.epub.EpubActivity
-import org.readium.r2.testapp.epub.R2SyntheticPageList
 import org.readium.r2.testapp.opds.GridAutoFitLayoutManager
 import org.readium.r2.testapp.opds.OPDSDownloader
 import org.readium.r2.testapp.permissions.PermissionHelper
@@ -488,20 +487,6 @@ open class LibraryActivity : AppCompatActivity(), BooksAdapter.RecyclerViewClick
             }
         } catch (e: Throwable) {
             e.printStackTrace()
-        }
-    }
-
-    fun prepareSyntheticPageList(pub: Publication, book: Book) {
-        if (pub.pageList.isEmpty() && !(positionsDB.positions.isInitialized(book.id!!))) {
-            val syntheticPageList = R2SyntheticPageList(positionsDB, book.id!!, pub.metadata.identifier!!)
-
-            when (pub.type) {
-                Publication.TYPE.EPUB -> syntheticPageList.execute(Triple("$BASE_URL:$localPort/", book.fileName!!, pub.readingOrder))
-                Publication.TYPE.WEBPUB -> syntheticPageList.execute(Triple("", book.fileName!!, pub.readingOrder))
-                else -> {
-                    //no page list
-                }
-            }
         }
     }
 
