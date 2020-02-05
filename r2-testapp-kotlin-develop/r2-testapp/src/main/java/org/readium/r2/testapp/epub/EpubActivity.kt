@@ -90,6 +90,18 @@ class EpubActivity : R2EpubActivity(), CoroutineScope,
         ref.index = value
         userSettings.updateEnumerable(ref)
         userSettings.updateViewCSS(APPEARANCE_REF)
+
+        when (value) {
+            0 -> {
+                resourcePager.setBackgroundColor(Color.parseColor("#ffffff"))
+            }
+            1 -> {
+                resourcePager.setBackgroundColor(Color.parseColor("#faf4e8"))
+            }
+            2 -> {
+                resourcePager.setBackgroundColor(Color.parseColor("#000000"))
+            }
+        }
     }
 
     /**

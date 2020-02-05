@@ -131,7 +131,7 @@
             android:layout_marginEnd="10dip"
             android:max="100"
             android:min="1"
-            android:onProgressChanged="@{viewModel.onBrightnessSeekChanged}"
+            android:onProgressChanged="@{viewModel::onBrightnessSeekChanged}"
             android:progress="50"
             android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="@+id/img_theme"

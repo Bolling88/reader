@@ -53,7 +53,7 @@
                 android:layout_marginStart="15dip"
                 android:thumb="@drawable/ic_handle"
                 android:layout_marginEnd="15dip"
-                android:onProgressChanged="@{viewModel.onPageSeekChanged}"
+                android:onProgressChanged="@{viewModel::onPageSeekChanged}"
                 app:layout_constraintBottom_toBottomOf="@+id/img_more"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/img_more"
