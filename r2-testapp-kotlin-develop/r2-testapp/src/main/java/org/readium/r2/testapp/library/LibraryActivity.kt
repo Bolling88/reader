@@ -25,16 +25,12 @@ import android.net.NetworkInfo
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
-import android.text.TextUtils
-import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.View
 import android.webkit.MimeTypeMap
-import android.webkit.URLUtil
 import android.widget.Button
-import android.widget.EditText
 import android.widget.ListPopupWindow
 import android.widget.PopupWindow
 import androidx.appcompat.app.AlertDialog
@@ -48,8 +44,6 @@ import kotlinx.coroutines.launch
 import nl.komponents.kovenant.Promise
 import nl.komponents.kovenant.task
 import nl.komponents.kovenant.then
-import nl.komponents.kovenant.ui.failUi
-import nl.komponents.kovenant.ui.successUi
 import org.jetbrains.anko.*
 import org.jetbrains.anko.appcompat.v7.Appcompat
 import org.jetbrains.anko.design.*
@@ -79,7 +73,6 @@ import org.readium.r2.testapp.BuildConfig.DEBUG
 import org.readium.r2.testapp.R
 import org.readium.r2.testapp.db.*
 import org.readium.r2.testapp.drm.LCPLibraryActivityService
-import org.readium.r2.testapp.epub.CustomEpubActivity
 import org.readium.r2.testapp.epub.EpubActivity
 import org.readium.r2.testapp.epub.R2SyntheticPageList
 import org.readium.r2.testapp.opds.GridAutoFitLayoutManager

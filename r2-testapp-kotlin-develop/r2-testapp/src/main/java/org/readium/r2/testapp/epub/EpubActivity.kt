@@ -10,56 +10,23 @@
 
 package org.readium.r2.testapp.epub
 
-import android.app.Activity
-import android.content.Context
-import android.content.Intent
-import android.content.SharedPreferences
 import android.graphics.Color
-import android.graphics.Point
-import android.graphics.Rect
 import android.os.Bundle
 import android.os.Handler
-import android.util.DisplayMetrics
-import android.view.*
+import android.view.MenuItem
+import android.view.View
 import android.view.accessibility.AccessibilityManager
-import android.view.inputmethod.InputMethodManager
-import android.widget.*
-import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.widget.SearchView
-import androidx.recyclerview.widget.LinearLayoutManager
+import android.widget.TextView
 import androidx.viewpager.widget.ViewPager
-import com.google.gson.Gson
-import kotlinx.android.synthetic.main.activity_epub.*
-import kotlinx.android.synthetic.main.filter_row.view.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import org.jetbrains.anko.appcompat.v7.coroutines.onClose
-import org.jetbrains.anko.indeterminateProgressDialog
-import org.jetbrains.anko.intentFor
 import org.jetbrains.anko.toast
-import org.json.JSONArray
-import org.json.JSONException
-import org.json.JSONObject
 import org.readium.r2.navigator.Navigator
 import org.readium.r2.navigator.NavigatorDelegate
 import org.readium.r2.navigator.epub.R2EpubActivity
-import org.readium.r2.navigator.epub.Style
-import org.readium.r2.navigator.pager.R2EpubPageFragment
-import org.readium.r2.navigator.pager.R2PagerAdapter
 import org.readium.r2.shared.*
-import org.readium.r2.testapp.BuildConfig.DEBUG
-import org.readium.r2.testapp.DRMManagementActivity
 import org.readium.r2.testapp.R
-import org.readium.r2.testapp.db.*
 import org.readium.r2.testapp.epub.fragment.OverlayFragment
 import org.readium.r2.testapp.library.activitiesLaunched
-import org.readium.r2.testapp.outline.R2OutlineActivity
-import org.readium.r2.testapp.search.MarkJSSearchEngine
-import org.readium.r2.testapp.search.SearchLocator
-import org.readium.r2.testapp.search.SearchLocatorAdapter
-import timber.log.Timber
-import kotlin.coroutines.CoroutineContext
 
 class EpubActivity : R2EpubActivity(), NavigatorDelegate {
 
