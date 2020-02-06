@@ -1,6 +1,6 @@
 package org.readium.r2.testapp.epub
 
-import android.app.ProgressDialog
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -8,14 +8,11 @@ import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
+import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import nl.komponents.kovenant.task
-import nl.komponents.kovenant.then
-import org.jetbrains.anko.design.longSnackbar
-import org.jetbrains.anko.design.snackbar
-import org.jetbrains.anko.indeterminateProgressDialog
 import org.readium.r2.shared.Injectable
 import org.readium.r2.shared.Publication
 import org.readium.r2.streamer.container.ContainerError
@@ -28,7 +25,6 @@ import org.readium.r2.streamer.server.Server
 import org.readium.r2.testapp.BuildConfig
 import org.readium.r2.testapp.R
 import org.readium.r2.testapp.db.Book
-import org.readium.r2.testapp.db.books
 import org.readium.r2.testapp.permissions.PermissionHelper
 import org.readium.r2.testapp.permissions.Permissions
 import org.readium.r2.testapp.utils.ContentResolverUtil
@@ -41,15 +37,9 @@ import java.util.*
 import java.util.zip.ZipException
 import kotlin.coroutines.CoroutineContext
 
-class BookCoverActivity : AppCompatActivity(), CoroutineScope {
+class BookCoverActivity : AppCompatActivity() {
 
-    /**
-     * Context of this scope.
-     */
-    override val coroutineContext: CoroutineContext
-        get() = Dispatchers.Main
-
-    private lateinit var R2DIRECTORY: String
+    private lateinit var directory: String
     private lateinit var permissionHelper: PermissionHelper
     private lateinit var permissions: Permissions
     private lateinit var preferences: SharedPreferences
@@ -78,32 +68,39 @@ class BookCoverActivity : AppCompatActivity(), CoroutineScope {
         properties.load(inputStream)
         val useExternalFileDir = properties.getProperty("useExternalFileDir", "false")!!.toBoolean()
 
-        R2DIRECTORY = if (useExternalFileDir) {
+        directory = if (useExternalFileDir) {
             this.getExternalFilesDir(null)?.path + "/"
         } else {
             this.filesDir.path + "/"
         }
-    }
 
-    override fun onStart() {
-        super.onStart()
         startServer()
         parseIntentPublication("http://www.gutenberg.org/cache/epub/61253/pg61253.epub")
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        stopServer()
+    }
+
+    @SuppressLint("CheckResult")
     private fun parseIntentPublication(uriString: String) {
         val uri: Uri? = Uri.parse(uriString)
         if (uri != null) {
 
             val fileName = UUID.randomUUID().toString()
-            val publicationPath = R2DIRECTORY + fileName
+            val publicationPath = directory + fileName
 
-            task {
+            Observable.fromCallable {
                 ContentResolverUtil.getContentInputStream(this, uri, publicationPath)
-            } then {
-                preparePublication(publicationPath, uriString, fileName)
             }
-
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
+                    preparePublication(publicationPath, uriString, fileName)
+                }, {
+                    Timber.e(it)
+                })
         }
     }
 
@@ -113,43 +110,54 @@ class BookCoverActivity : AppCompatActivity(), CoroutineScope {
         val file = File(publicationPath)
 
         try {
-            launch {
-
-                when {
-                    uriString.endsWith(Publication.EXTENSION.EPUB.value) -> {
-                        val parser = EpubParser()
-                        val pub = parser.parse(publicationPath)
-                        if (pub != null) {
-                            prepareToServe(pub, fileName, file.absolutePath, add = true, lcp = pub.container.drm?.let { true }
+            when {
+                uriString.endsWith(Publication.EXTENSION.EPUB.value) -> {
+                    val parser = EpubParser()
+                    val pub = parser.parse(publicationPath)
+                    if (pub != null) {
+                        prepareToServe(
+                            pub,
+                            fileName,
+                            file.absolutePath,
+                            lcp = pub.container.drm?.let { true }
                                 ?: false)
-                        }
                     }
-                    uriString.endsWith(Publication.EXTENSION.CBZ.value) -> {
-                        val parser = CBZParser()
-                        val pub = parser.parse(publicationPath)
-                        if (pub != null) {
-                            prepareToServe(pub, fileName, file.absolutePath, add = true, lcp = pub.container.drm?.let { true }
+                }
+                uriString.endsWith(Publication.EXTENSION.CBZ.value) -> {
+                    val parser = CBZParser()
+                    val pub = parser.parse(publicationPath)
+                    if (pub != null) {
+                        prepareToServe(
+                            pub,
+                            fileName,
+                            file.absolutePath,
+                            lcp = pub.container.drm?.let { true }
                                 ?: false)
-                        }
                     }
-                    uriString.endsWith(Publication.EXTENSION.AUDIO.value) -> {
-                        val parser = AudioBookParser()
-                        val pub = parser.parse(publicationPath)
-                        if (pub != null) {
-                            prepareToServe(pub, fileName, file.absolutePath, add = true, lcp = pub.container.drm?.let { true }
+                }
+                uriString.endsWith(Publication.EXTENSION.AUDIO.value) -> {
+                    val parser = AudioBookParser()
+                    val pub = parser.parse(publicationPath)
+                    if (pub != null) {
+                        prepareToServe(
+                            pub,
+                            fileName,
+                            file.absolutePath,
+                            lcp = pub.container.drm?.let { true }
                                 ?: false)
-                        }
                     }
-                    uriString.endsWith(Publication.EXTENSION.DIVINA.value) -> {
-                        val parser = DiViNaParser()
-                        val pub = parser.parse(publicationPath)
-                        if (pub != null) {
-                            prepareToServe(pub, fileName, file.absolutePath, add = true, lcp = pub.container.drm?.let { true }
+                }
+                uriString.endsWith(Publication.EXTENSION.DIVINA.value) -> {
+                    val parser = DiViNaParser()
+                    val pub = parser.parse(publicationPath)
+                    if (pub != null) {
+                        prepareToServe(
+                            pub,
+                            fileName,
+                            file.absolutePath,
+                            lcp = pub.container.drm?.let { true }
                                 ?: false)
-                        }
                     }
-
-
                 }
             }
         } catch (e: Throwable) {
@@ -157,7 +165,7 @@ class BookCoverActivity : AppCompatActivity(), CoroutineScope {
         }
     }
 
-    protected fun prepareToServe(pub: PubBox?, fileName: String, absolutePath: String, add: Boolean, lcp: Boolean) {
+    private fun prepareToServe(pub: PubBox?, fileName: String, absolutePath: String, lcp: Boolean) {
         if (pub == null) {
             Toast.makeText(this, "Invalid publication", Toast.LENGTH_LONG).show()
             return
@@ -165,69 +173,110 @@ class BookCoverActivity : AppCompatActivity(), CoroutineScope {
         val publication = pub.publication
         val container = pub.container
 
-        launch {
-            val publicationIdentifier = publication.metadata.identifier!!
-            val book: Book = when (publication.type) {
-                Publication.TYPE.EPUB -> {
-                    preferences.edit().putString("$publicationIdentifier-publicationPort", localPort.toString()).apply()
-                    val author = authorName(publication)
-                    val cover = publication.coverLink?.href?.let {
-                        try {
-                            ZipUtil.unpackEntry(File(absolutePath), it.removePrefix("/"))
-                        } catch (e: ZipException) {
-                            null
-                        }
+        val publicationIdentifier = publication.metadata.identifier!!
+        val book: Book = when (publication.type) {
+            Publication.TYPE.EPUB -> {
+                preferences.edit()
+                    .putString("$publicationIdentifier-publicationPort", localPort.toString())
+                    .apply()
+                val author = authorName(publication)
+                val cover = publication.coverLink?.href?.let {
+                    try {
+                        ZipUtil.unpackEntry(File(absolutePath), it.removePrefix("/"))
+                    } catch (e: ZipException) {
+                        null
                     }
-
-                    if (!lcp) {
-                        server.addEpub(publication, container, "/$fileName", applicationContext.filesDir.path + "/" + Injectable.Style.rawValue + "/UserProperties.json")
-                    }
-                    Book(title = publication.metadata.title, author = author, href = absolutePath, identifier = publicationIdentifier, cover = cover, ext = Publication.EXTENSION.EPUB, progression = "{}")
                 }
-                Publication.TYPE.CBZ -> {
-                    val cover = publication.coverLink?.href?.let {
-                        try {
-                            container.data(it)
-                        } catch (e: ContainerError.fileNotFound) {
-                            null
-                        }
-                    }
 
-                    Book(title = publication.metadata.title, href = absolutePath, identifier = publicationIdentifier, cover = cover, ext = Publication.EXTENSION.CBZ, progression = "{}")
+                if (!lcp) {
+                    server.addEpub(
+                        publication,
+                        container,
+                        "/$fileName",
+                        applicationContext.filesDir.path + "/" + Injectable.Style.rawValue + "/UserProperties.json"
+                    )
                 }
-                Publication.TYPE.DiViNa -> {
-                    val cover = publication.coverLink?.href?.let {
-                        try {
-                            container.data(it)
-                        } catch (e: ContainerError.fileNotFound) {
-                            null
-                        }
-                    }
-
-                    Book(title = publication.metadata.title, href = absolutePath, identifier = publicationIdentifier, cover = cover, ext = Publication.EXTENSION.DIVINA, progression = "{}")
-                }
-                Publication.TYPE.AUDIO -> {
-                    val cover = publication.coverLink?.href?.let {
-                        try {
-                            container.data(it)
-                        } catch (e: ContainerError.fileNotFound) {
-                            null
-                        }
-                    }
-
-                    //Building book object and adding it to library
-                    Book(title = publication.metadata.title, href = absolutePath, identifier = publicationIdentifier, cover = cover, ext = Publication.EXTENSION.AUDIO, progression = "{}")
-                }
-                else -> TODO()
+                Book(
+                    title = publication.metadata.title,
+                    author = author,
+                    href = absolutePath,
+                    identifier = publicationIdentifier,
+                    cover = cover,
+                    ext = Publication.EXTENSION.EPUB,
+                    progression = "{}"
+                )
             }
-            startActivity(absolutePath, book, publication)
+            Publication.TYPE.CBZ -> {
+                val cover = publication.coverLink?.href?.let {
+                    try {
+                        container.data(it)
+                    } catch (e: ContainerError.fileNotFound) {
+                        null
+                    }
+                }
+
+                Book(
+                    title = publication.metadata.title,
+                    href = absolutePath,
+                    identifier = publicationIdentifier,
+                    cover = cover,
+                    ext = Publication.EXTENSION.CBZ,
+                    progression = "{}"
+                )
+            }
+            Publication.TYPE.DiViNa -> {
+                val cover = publication.coverLink?.href?.let {
+                    try {
+                        container.data(it)
+                    } catch (e: ContainerError.fileNotFound) {
+                        null
+                    }
+                }
+
+                Book(
+                    title = publication.metadata.title,
+                    href = absolutePath,
+                    identifier = publicationIdentifier,
+                    cover = cover,
+                    ext = Publication.EXTENSION.DIVINA,
+                    progression = "{}"
+                )
+            }
+            Publication.TYPE.AUDIO -> {
+                val cover = publication.coverLink?.href?.let {
+                    try {
+                        container.data(it)
+                    } catch (e: ContainerError.fileNotFound) {
+                        null
+                    }
+                }
+
+                //Building book object and adding it to library
+                Book(
+                    title = publication.metadata.title,
+                    href = absolutePath,
+                    identifier = publicationIdentifier,
+                    cover = cover,
+                    ext = Publication.EXTENSION.AUDIO,
+                    progression = "{}"
+                )
+            }
+            else -> TODO()
         }
+        startActivity(absolutePath, book, publication)
     }
 
-    private fun startActivity(publicationPath: String, book: Book, publication: Publication, coverByteArray: ByteArray? = null) {
-        val intent = Intent(this, when (publication.type) {
-            else -> EpubActivity::class.java
-        })
+    private fun startActivity(
+        publicationPath: String,
+        book: Book,
+        publication: Publication,
+        coverByteArray: ByteArray? = null
+    ) {
+        val intent = Intent(
+            this, when (publication.type) {
+                else -> EpubActivity::class.java
+            }
+        )
         intent.putExtra("publicationPath", publicationPath)
         intent.putExtra("publicationFileName", book.fileName)
         intent.putExtra("publication", publication)
@@ -265,11 +314,31 @@ class BookCoverActivity : AppCompatActivity(), CoroutineScope {
 //                server.loadCustomResource(assets.open("styles/test.css"), "test.css")
 //                server.loadCustomFont(assets.open("fonts/test.otf"), applicationContext, "test.otf")
 
-                server.loadCustomResource(assets.open("Search/mark.js"), "mark.js", Injectable.Script)
-                server.loadCustomResource(assets.open("Search/search.js"), "search.js", Injectable.Script)
-                server.loadCustomResource(assets.open("Search/mark.css"), "mark.css", Injectable.Style)
-                server.loadCustomResource(assets.open("scripts/crypto-sha256.js"), "crypto-sha256.js", Injectable.Script)
-                server.loadCustomResource(assets.open("scripts/highlight.js"), "highlight.js", Injectable.Script)
+                server.loadCustomResource(
+                    assets.open("Search/mark.js"),
+                    "mark.js",
+                    Injectable.Script
+                )
+                server.loadCustomResource(
+                    assets.open("Search/search.js"),
+                    "search.js",
+                    Injectable.Script
+                )
+                server.loadCustomResource(
+                    assets.open("Search/mark.css"),
+                    "mark.css",
+                    Injectable.Style
+                )
+                server.loadCustomResource(
+                    assets.open("scripts/crypto-sha256.js"),
+                    "crypto-sha256.js",
+                    Injectable.Script
+                )
+                server.loadCustomResource(
+                    assets.open("scripts/highlight.js"),
+                    "highlight.js",
+                    Injectable.Script
+                )
 
 
             }

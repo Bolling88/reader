@@ -108,7 +108,7 @@ class EpubActivity : R2EpubActivity(), NavigatorDelegate {
             }
 
             override fun onPageSelected(position: Int) {
-                val resource = publication.readingOrder[resourcePager.currentItem]
+                //val resource = publication.readingOrder[resourcePager.currentItem]
                 //here chapter have changed
             }
         })

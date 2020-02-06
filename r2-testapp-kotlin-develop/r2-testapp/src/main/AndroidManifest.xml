@@ -18,9 +18,8 @@
         android:usesCleartextTraffic="true"
         tools:replace="android:allowBackup"
         tools:targetApi="m">
-        <activity android:name=".epub.BookCoverActivity"></activity>
         <activity
-            android:name=".CatalogActivity"
+            android:name=".epub.BookCoverActivity"
             android:configChanges="orientation|screenSize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

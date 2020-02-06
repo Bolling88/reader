@@ -157,6 +157,10 @@ dependencies {
     //for JVM
     implementation 'com.github.kittinunf.fuel:fuel-android:1.16.0'
 
+    implementation 'io.reactivex.rxjava2:rxjava:2.2.9'
+    implementation "io.reactivex.rxjava2:rxkotlin:2.3.0"
+    implementation "io.reactivex.rxjava2:rxandroid:2.1.1"
+
     // async functions (only ~70k)
     final KOVENANT_VERSION = '3.3.0'
     implementation "nl.komponents.kovenant:kovenant:$KOVENANT_VERSION"
