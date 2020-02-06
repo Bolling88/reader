@@ -183,6 +183,5 @@ class EpubActivity : R2EpubActivity(), NavigatorDelegate {
 
     override fun playTextChanged(text: String) {
         super.playTextChanged(text)
-        findViewById<TextView>(R.id.tts_textView)?.text = text
     }
 }
